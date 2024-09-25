@@ -1,49 +1,100 @@
 const { autoUpdater } = require('electron-updater');
 const log = require('electron-log');
 
-class Updater {
+class AutoUpdater {
     constructor(mainWindow) {
         this.mainWindow = mainWindow;
 
-        // Registrando os manipuladores de eventos de atualização
-        this.registerUpdateHandlers();
+        // Configurar o autoUpdater para registrar logs
+        autoUpdater.logger = log;
+        autoUpdater.logger.transports.file.level = 'info';
+
+        // Vincular os eventos
+        this.bindEvents();
     }
 
-    registerUpdateHandlers() {
-        autoUpdater.on('checking-for-update', () => log.log('Checking for updates.'));
-        autoUpdater.on('update-available', () => log.log('Update available.'));
-        autoUpdater.on('download-progress', this.handleDownloadProgress.bind(this));
-        autoUpdater.on('error', (err) => log.log(`Update check failed: ${err.toString()}`));
-        autoUpdater.on('update-not-available', () => log.log('Não há atualizações disponíveis para o launcher.'));
-        autoUpdater.on('update-downloaded', this.handleUpdateDownloaded.bind(this));
+    // Função para verificar atualizações manualmente
+    checkForUpdates() {
+        log.log('Verificando manualmente por atualizações.');
+        autoUpdater.checkForUpdates();
     }
 
-    handleDownloadProgress(progressObj) {
-        const message = `Downloading update. Speed: ${progressObj.bytesPerSecond} - ${~~progressObj.percent}% [${progressObj.transferred}/${progressObj.total}]`;
-        log.log(message);
-        this.displaySwalMessage('Baixando atualização', message);
-    }
+    // Função para vincular os manipuladores de eventos
+    bindEvents() {
+        autoUpdater.on('checking-for-update', () => {
+            log.log('Checking for updates.');
+            this.mainWindow.webContents.executeJavaScript(`
+                Swal.fire({
+                    title: 'Procurando por atualizações...',
+                    allowOutsideClick: false,
+                    onBeforeOpen: () => Swal.showLoading()
+                });
+            `);
+        });
 
-    handleUpdateDownloaded() {
-        this.displaySwalMessage('Reiniciando o aplicativo', 'Aguente firme, reiniciando o aplicativo para atualização!');
-        autoUpdater.quitAndInstall();
-    }
+        autoUpdater.on('update-available', (info) => {
+            log.log('Update available.');
+            this.mainWindow.webContents.executeJavaScript(`
+                Swal.fire({
+                    title: 'Atualização disponível',
+                    text: 'Uma nova atualização está disponível!',
+                    icon: 'info',
+                    allowOutsideClick: false
+                });
+            `);
+        });
 
-    displaySwalMessage(title, message) {
-        const swalMessage = `
-            Swal.fire({
-                title: '${title}',
+        autoUpdater.on('update-not-available', () => {
+            log.log('Não há atualizações disponíveis para o launcher.');
+            this.mainWindow.webContents.executeJavaScript(`
+                Swal.fire({
+                    title: 'Nenhuma atualização disponível',
+                    text: 'Você já está utilizando a versão mais recente.',
+                    icon: 'info',
+                    allowOutsideClick: true
+                });
+            `);
+        });
+
+        autoUpdater.on('download-progress', (progressObj) => {
+            const message = `Downloading update. Speed: ${progressObj.bytesPerSecond} - ${~~progressObj.percent}% [${progressObj.transferred}/${progressObj.total}]`;
+            log.log(message);
+
+            const swalMessage = `Swal.fire({
+                title: 'Baixando atualização',
                 html: '${message}',
                 allowOutsideClick: false,
                 onBeforeOpen: () => Swal.showLoading()
-            });
-        `;
-        this.mainWindow.webContents.executeJavaScript(swalMessage);
-    }
+            });`;
 
-    checkForUpdates() {
-        autoUpdater.checkForUpdates();
+            this.mainWindow.webContents.executeJavaScript(swalMessage);
+        });
+
+        autoUpdater.on('error', (err) => {
+            log.log(`Update check failed: ${err.toString()}`);
+            this.mainWindow.webContents.executeJavaScript(`
+                Swal.fire({
+                    title: 'Erro ao buscar atualização',
+                    text: '${err.toString()}',
+                    icon: 'error',
+                    allowOutsideClick: true
+                });
+            `);
+        });
+
+        autoUpdater.on('update-downloaded', () => {
+            log.log('Atualização baixada. Reiniciando o aplicativo...');
+            const swalMessage = `Swal.fire({
+                title: 'Reiniciando o aplicativo',
+                html: 'Aguente firme, reiniciando o aplicativo para aplicar a atualização!',
+                allowOutsideClick: false,
+                onBeforeOpen: () => Swal.showLoading()
+            });`;
+
+            this.mainWindow.webContents.executeJavaScript(swalMessage);
+            autoUpdater.quitAndInstall();
+        });
     }
 }
 
-module.exports = Updater;
+module.exports = AutoUpdater;
