@@ -42,9 +42,6 @@ toggler.addEventListener('change', function () {
     }
 });
 
-const version = '1.2.6';
-document.getElementById('version-number').textContent = version;
-
 document.getElementById('logoutBtn')?.addEventListener('click', () => {
     window.location.href = 'login.html';
 });
