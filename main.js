@@ -1,7 +1,6 @@
 const { app, BrowserWindow, shell, dialog } = require('electron');
 const path = require('path');
 const { autoUpdater } = require('electron-updater');
-const Swal = require('sweetalert2');
 
 let mainWindow; // Variável para armazenar a janela principal
 
