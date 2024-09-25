@@ -1,6 +1,7 @@
 const { app, Menu } = require('electron');
 const path = require('path');
-const { shell } = require('electron'); // Adicione isso para abrir links no navegador
+const { shell } = require('electron');
+const { autoUpdater } = require('electron-updater');
 
 class AppMenu {
     constructor(mainWindow) {
@@ -17,6 +18,12 @@ class AppMenu {
                         label: 'Mostrar',
                         click: () => {
                             this.mainWindow.mainWindow.show();
+                        }
+                    },
+                    {
+                        label: 'Verificar Atualizações', // Novo botão para verificar atualizações
+                        click: () => {
+                            autoUpdater.checkForUpdates(); // Chama o método para verificar atualizações manualmente
                         }
                     },
                     {

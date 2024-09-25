@@ -3,6 +3,7 @@ const MainWindow = require('./window');
 const Updater = require('./autoUpdater');
 const AppMenu = require('./menu');
 const AppTray = require('./tray');
+const { autoUpdater } = require('electron-updater');
 
 let mainWindow;
 
@@ -10,6 +11,8 @@ let mainWindow;
 app.whenReady().then(() => {
     mainWindow = new MainWindow();
     mainWindow.createWindow();
+
+    autoUpdater.checkForUpdates();
 
     new AppMenu(mainWindow);  // Cria o menu
     new AppTray(mainWindow);   // Cria o Tray
