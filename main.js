@@ -1,6 +1,5 @@
 const { app } = require('electron');
 const MainWindow = require('./window');
-const Updater = require('./autoUpdater');
 const AppMenu = require('./menu');
 const AppTray = require('./tray');
 const { autoUpdater } = require('electron-updater');
@@ -16,9 +15,6 @@ app.whenReady().then(() => {
 
     new AppMenu(mainWindow);  // Cria o menu
     new AppTray(mainWindow);   // Cria o Tray
-
-    const updater = new Updater(mainWindow);
-    updater.checkForUpdates();
 });
 
 // Encerrar o aplicativo quando todas as janelas forem fechadas, exceto no macOS
