@@ -52,38 +52,52 @@ function createWindow() {
 // Função para criar o Tray
 function createTray() {
     try {
+        // Define o caminho do ícone com base no ambiente
         const iconPath = process.env.NODE_ENV === 'development' 
             ? path.join(__dirname, 'build/icon.png') 
             : path.join(process.resourcesPath, 'build/icon.png');
 
+        // Verifica se o ícone existe no caminho primário
         if (!fs.existsSync(iconPath)) {
-            throw new Error(`Icon not found at path: ${iconPath}`);
+            console.warn(`Icon not found at path: ${iconPath}, trying fallback path...`);
+            // Define um caminho alternativo
+            const fallbackIconPath = path.join(__dirname, 'build', 'icon.png');
+            
+            // Verifica se o ícone de fallback existe
+            if (!fs.existsSync(fallbackIconPath)) {
+                throw new Error(`Neither primary nor fallback icons found. Primary: ${iconPath}, Fallback: ${fallbackIconPath}`);
+            }
+
+            // Se o ícone principal não foi encontrado, use o de fallback
+            tray = new Tray(fallbackIconPath);
+        } else {
+            // Se o ícone principal foi encontrado
+            tray = new Tray(iconPath);
         }
 
-        tray = new Tray(iconPath);
-            const trayMenu = Menu.buildFromTemplate([
-                { label: 'Mostrar Aplicativo', click: () => { mainWindow.show(); } },
-                { type: 'separator' }, // Separador
-                {
-                    label: 'Redes Sociais',
-                    submenu: [
-                        {
-                            label: 'YouTube',
-                            click: () => {
-                                shell.openExternal('https://www.youtube.com/@renildomarcio'); // Substitua pela sua URL
-                            }
-                        },
-                        {
-                            label: 'GitHub',
-                            click: () => {
-                                shell.openExternal('https://github.com/psycodeliccircus'); // Substitua pela sua URL
-                            }
+        const trayMenu = Menu.buildFromTemplate([
+            { label: 'Mostrar Aplicativo', click: () => { mainWindow.show(); } },
+            { type: 'separator' },
+            {
+                label: 'Redes Sociais',
+                submenu: [
+                    {
+                        label: 'YouTube',
+                        click: () => {
+                            shell.openExternal('https://www.youtube.com/@renildomarcio');
                         }
-                    ]
-                },
-                { type: 'separator' }, // Separador
-                { label: 'Sair', click: () => { app.quit(); } }
-            ]);
+                    },
+                    {
+                        label: 'GitHub',
+                        click: () => {
+                            shell.openExternal('https://github.com/psycodeliccircus');
+                        }
+                    }
+                ]
+            },
+            { type: 'separator' },
+            { label: 'Sair', click: () => { app.quit(); } }
+        ]);
 
         tray.setToolTip('Launcher Mods');
         tray.setContextMenu(trayMenu);
