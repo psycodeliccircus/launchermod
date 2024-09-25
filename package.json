@@ -1,0 +1,33 @@
+{
+    "name": "launchermods",
+    "version": "1.0.0",
+    "description": "Sistema Launcher Mods",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron .",
+        "build": "node build.js --build",
+        "icon": "node build.js --icon=https://downloadr2.apkmirror.com/wp-content/uploads/2022/03/Pixel-Launcher-Mods_round.png"
+    },
+    "keywords": [
+        "electron",
+        "download",
+        "mods",
+        "desktop-app"
+    ],
+    "author": "Renildo Marcio",
+    "license": "MIT",
+    "devDependencies": {
+        "electron": "^32.1.2",
+        "electron-builder": "^25.0.5",
+        "electron-packager": "^17.1.2"
+    },
+    "dependencies": {
+        "electron-is-dev": "^3.0.1",
+        "electron-log": "^5.2.0",
+        "electron-updater": "^6.3.4",
+        "jimp": "^0.22.12",
+        "node-fetch": "^2.7.0",
+        "png2icons": "^2.0.1",
+        "sweetalert2": "^11.14.1"
+    }
+}

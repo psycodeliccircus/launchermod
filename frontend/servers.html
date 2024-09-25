@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <title>Servidores de Jogos</title>
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+      <a href="mods.html" class="logo">
+          <i class='bx bx-code-alt'></i>
+          <div class="logo-name"><span>Launcher</span>Mod</div>
+      </a>
+      <ul class="side-menu">
+          <li><a href="mods.html"><i class='bx bx-cloud-download'></i>Mods</a></li>
+          <li><a href="dlcs.html"><i class='bx bx-cloud-download'></i>DLCs</a></li>
+          <li class="active"><a href="servers.html"><i class='bx bx-server'></i>Servidores</a></li>
+          <li><a href="contact.html"><i class='bx bx-mail-send'></i>Contato</a></li>
+      </ul>
+      <ul class="side-menu">
+        <li>
+            <a href="#" id="logoutBtn" class="logout">
+                <i class='bx bx-chevron-right-square'></i>
+                Sair
+            </a>
+        </li>
+    </ul>
+  </div>
+  <!-- End of Sidebar -->
+
+    <!-- Main Content -->
+    <div class="content">
+        <!-- Navbar -->
+        <nav>
+            <i class='bx bx-menu'></i>
+            <form action="#"></form>
+            <input type="checkbox" id="theme-toggle" hidden>
+            <label for="theme-toggle" class="theme-toggle"></label>
+        </nav>
+        <!-- End of Navbar -->
+
+        <main>
+            <div class="header">
+                <div class="left">
+                    <h1>Servidores de Jogos</h1>
+                </div>
+            </div>
+
+            <div class="bottom-data">
+                <div class="orders">
+                    <div class="header">
+                        <i class='bx bx-server'></i>
+                        <h3>Lista de Servidores</h3>
+                    </div>
+                    <table id="serversTable">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Link</th>
+                            </tr>
+                        </thead>
+                        <tbody id="serversList">
+                            <!-- A lista de servidores será inserida aqui -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Seleciona o elemento da tabela
+            const serverList = document.getElementById('serversList');
+    
+            // Fetch para obter a lista de servidores
+            fetch('https://api.renildomarcio.com.br/backend/servers.php')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro na resposta do servidor: ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(servers => {
+                    // Verifica se há servidores retornados
+                    if (servers.length === 0) {
+                        const emptyMessage = document.createElement('tr');
+                        emptyMessage.innerHTML = '<td colspan="2">Nenhum servidor disponível no momento.</td>';
+                        serverList.appendChild(emptyMessage);
+                        return;
+                    }
+    
+                    // Itera sobre os servidores e adiciona à tabela
+                    servers.forEach(server => {
+                        const row = document.createElement('tr');
+    
+                        // Cria células da tabela de forma mais segura
+                        const nameCell = document.createElement('td');
+                        nameCell.textContent = server.name;
+    
+                        const linkCell = document.createElement('td');
+                        const link = document.createElement('a');
+                        link.href = server.link;
+                        link.className = 'report';
+                        link.textContent = 'Entrar';
+                        link.setAttribute('aria-label', `Entrar no servidor ${server.name}`);
+                        linkCell.appendChild(link);
+    
+                        // Adiciona as células à linha
+                        row.appendChild(nameCell);
+                        row.appendChild(linkCell);
+    
+                        // Adiciona a linha à tabela
+                        serverList.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar os servidores:', error);
+                    // Exibe uma mensagem para o usuário em caso de erro
+                    const errorMessage = document.createElement('tr');
+                    errorMessage.innerHTML = '<td colspan="2">Erro ao carregar os servidores. Tente novamente mais tarde.</td>';
+                    serverList.appendChild(errorMessage);
+                });
+        });
+    </script>
+ 
+    <script src="index.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>
