@@ -50,3 +50,9 @@ const version = '1.2.6';
 
 // Atualizando o conteúdo do elemento com a versão
 document.getElementById('version-number').textContent = version;
+
+
+document.getElementById('logoutBtn')?.addEventListener('click', () => {
+    // Redirecionar para a página de login ou uma página de boas-vindas
+    window.location.href = 'login.html'; // ou outra página que você desejar
+});
