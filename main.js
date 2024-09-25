@@ -38,7 +38,7 @@ app.on('activate', () => {
 // Manipuladores de atualização
 function handleUpdateChecking() {
   log.log('Checking for updates.');
-            this.mainWindow.webContents.executeJavaScript(`
+            mainWindow.webContents.executeJavaScript(`
                 Swal.fire({
                     title: 'Procurando por atualizações...',
                     allowOutsideClick: false,
@@ -49,7 +49,7 @@ function handleUpdateChecking() {
   
 function handleUpdateAvailable(info) {
   log.log('Update available.');
-            this.mainWindow.webContents.executeJavaScript(`
+            mainWindow.webContents.executeJavaScript(`
                 Swal.fire({
                     title: 'Atualização disponível',
                     text: 'Uma nova atualização está disponível!',
@@ -74,7 +74,7 @@ function handleDownloadProgress(progressObj) {
   
 function handleUpdateError(err) {
   log.log(`Update check failed: ${err.toString()}`);
-            this.mainWindow.webContents.executeJavaScript(`
+            mainWindow.webContents.executeJavaScript(`
                 Swal.fire({
                     title: 'Erro ao buscar atualização',
                     text: '${err.toString()}',
@@ -86,7 +86,7 @@ function handleUpdateError(err) {
   
 function handleUpdateNotAvailable(info) {
   log.log('Não há atualizações disponíveis para o launcher.');
-            this.mainWindow.webContents.executeJavaScript(`
+            mainWindow.webContents.executeJavaScript(`
                 Swal.fire({
                     title: 'Nenhuma atualização disponível',
                     text: 'Você já está utilizando a versão mais recente.',

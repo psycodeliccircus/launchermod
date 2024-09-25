@@ -3,7 +3,7 @@ const log = require('electron-log');
 
 class AutoUpdater {
     constructor(mainWindow) {
-        this.mainWindow = mainWindow;
+        mainWindow = mainWindow;
 
         // Configurar o autoUpdater para registrar logs
         autoUpdater.logger = log;
@@ -23,7 +23,7 @@ class AutoUpdater {
     bindEvents() {
         autoUpdater.on('checking-for-update', () => {
             log.log('Checking for updates.');
-            this.mainWindow.webContents.executeJavaScript(`
+            mainWindow.webContents.executeJavaScript(`
                 Swal.fire({
                     title: 'Procurando por atualizações...',
                     allowOutsideClick: false,
@@ -34,7 +34,7 @@ class AutoUpdater {
 
         autoUpdater.on('update-available', (info) => {
             log.log('Update available.');
-            this.mainWindow.webContents.executeJavaScript(`
+            mainWindow.webContents.executeJavaScript(`
                 Swal.fire({
                     title: 'Atualização disponível',
                     text: 'Uma nova atualização está disponível!',
@@ -46,7 +46,7 @@ class AutoUpdater {
 
         autoUpdater.on('update-not-available', () => {
             log.log('Não há atualizações disponíveis para o launcher.');
-            this.mainWindow.webContents.executeJavaScript(`
+            mainWindow.webContents.executeJavaScript(`
                 Swal.fire({
                     title: 'Nenhuma atualização disponível',
                     text: 'Você já está utilizando a versão mais recente.',
@@ -67,12 +67,12 @@ class AutoUpdater {
                 onBeforeOpen: () => Swal.showLoading()
             });`;
 
-            this.mainWindow.webContents.executeJavaScript(swalMessage);
+            mainWindow.webContents.executeJavaScript(swalMessage);
         });
 
         autoUpdater.on('error', (err) => {
             log.log(`Update check failed: ${err.toString()}`);
-            this.mainWindow.webContents.executeJavaScript(`
+            mainWindow.webContents.executeJavaScript(`
                 Swal.fire({
                     title: 'Erro ao buscar atualização',
                     text: '${err.toString()}',
@@ -91,7 +91,7 @@ class AutoUpdater {
                 onBeforeOpen: () => Swal.showLoading()
             });`;
 
-            this.mainWindow.webContents.executeJavaScript(swalMessage);
+            mainWindow.webContents.executeJavaScript(swalMessage);
             autoUpdater.quitAndInstall();
         });
     }
