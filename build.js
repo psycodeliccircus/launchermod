@@ -61,7 +61,14 @@ class Index {
                         target: "tar.gz",
                         arch: ["x64"]
                     }]
-                }
+                },
+                // Aqui é onde você adiciona o extraResources
+                extraResources: [
+                    {
+                        from: "build/icon.png", // Caminho da sua pasta de ícones ou qualquer outro arquivo
+                        to: "build/icon.png" // O destino no diretório final
+                    }
+                ]
             }
         }).then(() => {
             console.log('A build está concluída')
