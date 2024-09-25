@@ -51,39 +51,50 @@ function createWindow() {
 
 // Função para criar o Tray
 function createTray() {
-    const trayIcon = path.join(__dirname, 'build/icon.png'); // Caminho para o ícone da bandeja
-    tray = new Tray(trayIcon);
+    try {
+        const iconPath = process.env.NODE_ENV === 'development' 
+            ? path.join(__dirname, 'build/icon.png') 
+            : path.join(process.resourcesPath, 'build/icon.png');
 
-    const trayMenu = Menu.buildFromTemplate([
-        { label: 'Mostrar Aplicativo', click: () => { mainWindow.show(); } },
-        { type: 'separator' }, // Separador
-        {
-            label: 'Redes Sociais',
-            submenu: [
+        if (!fs.existsSync(iconPath)) {
+            throw new Error(`Icon not found at path: ${iconPath}`);
+        }
+
+        tray = new Tray(iconPath);
+            const trayMenu = Menu.buildFromTemplate([
+                { label: 'Mostrar Aplicativo', click: () => { mainWindow.show(); } },
+                { type: 'separator' }, // Separador
                 {
-                    label: 'YouTube',
-                    click: () => {
-                        shell.openExternal('https://www.youtube.com/@renildomarcio'); // Substitua pela sua URL
-                    }
+                    label: 'Redes Sociais',
+                    submenu: [
+                        {
+                            label: 'YouTube',
+                            click: () => {
+                                shell.openExternal('https://www.youtube.com/@renildomarcio'); // Substitua pela sua URL
+                            }
+                        },
+                        {
+                            label: 'GitHub',
+                            click: () => {
+                                shell.openExternal('https://github.com/psycodeliccircus'); // Substitua pela sua URL
+                            }
+                        }
+                    ]
                 },
-                {
-                    label: 'GitHub',
-                    click: () => {
-                        shell.openExternal('https://github.com/psycodeliccircus'); // Substitua pela sua URL
-                    }
-                }
-            ]
-        },
-        { type: 'separator' }, // Separador
-        { label: 'Sair', click: () => { app.quit(); } }
-    ]);
+                { type: 'separator' }, // Separador
+                { label: 'Sair', click: () => { app.quit(); } }
+            ]);
 
-    tray.setToolTip('Launcher Mods');
-    tray.setContextMenu(trayMenu);
+        tray.setToolTip('Launcher Mods');
+        tray.setContextMenu(trayMenu);
 
-    tray.on('click', () => {
-        mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
-    });
+        tray.on('click', () => {
+            mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
+        });
+
+    } catch (error) {
+        console.error('Failed to load tray icon:', error.message);
+    }
 }
 
 // Manipuladores de atualização
