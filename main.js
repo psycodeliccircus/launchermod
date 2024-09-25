@@ -52,7 +52,6 @@ function handleUpdateAvailable(info) {
 function handleDownloadProgress(progressObj) {
   const message = `Downloading update. Speed: ${progressObj.bytesPerSecond} - ${~~progressObj.percent}% [${progressObj.transferred}/${progressObj.total}]`;
   log.log(message);
-
   const swalMessage = `Swal.fire({
     title: 'Baixando atualização',
     html: '${message}',
@@ -69,13 +68,13 @@ function handleUpdateError(err) {
   
 function handleUpdateNotAvailable(info) {
   log.log(`Não há atualizações disponíveis para o launcher.`);
-  const swalMessage = `Swal.fire({
-    title: 'Sem atualizações disponíveis',
-    text: 'Você já está usando a versão mais recente do launcher.',
-    icon: 'info',
-    confirmButtonText: 'OK'
-  });`;
-  mainWindow.webContents.executeJavaScript(swalMessage);
+  //const swalMessage = `Swal.fire({
+    //title: 'Sem atualizações disponíveis',
+    //text: 'Você já está usando a versão mais recente do launcher.',
+    //icon: 'info',
+    //confirmButtonText: 'OK'
+  //});`;
+  //mainWindow.webContents.executeJavaScript(swalMessage);
 }
   
 function handleUpdateDownloaded(info) {
