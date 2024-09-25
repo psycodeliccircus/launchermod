@@ -42,6 +42,21 @@ function createWindow() {
     checkForUpdates(win);
 }
 
+// Função para monitorar o progresso de download
+function handleDownloadProgress(progressObj) {
+    const message = `Velocidade: ${(progressObj.bytesPerSecond / 1024).toFixed(2)} KB/s - ${Math.floor(progressObj.percent)}% 
+    (${(progressObj.transferred / 1024).toFixed(2)} KB de ${(progressObj.total / 1024).toFixed(2)} KB)`;
+
+    // Atualizar a janela do SweetAlert2 com o progresso
+    Swal.update({
+        title: 'Baixando atualização',
+        html: message,
+        allowOutsideClick: false,
+        showConfirmButton: false, // Remove o botão de confirmação
+        onBeforeOpen: () => Swal.showLoading() // Mantém o loading ativo
+    });
+}
+
 // Função para configurar e checar atualizações
 function checkForUpdates(win) {
     // Configurações do autoUpdater
@@ -63,6 +78,11 @@ function checkForUpdates(win) {
         });
     });
 
+    // Monitorar o progresso do download
+    autoUpdater.on('download-progress', (progressObj) => {
+        handleDownloadProgress(progressObj);
+    });
+    
     // Atualização já baixada e pronta para instalação
     autoUpdater.on('update-downloaded', () => {
         Swal.fire({
