@@ -1,6 +1,10 @@
-const { app, BrowserWindow, shell, dialog } = require('electron');
-const path = require('path');
+const { app, BrowserWindow, ipcMain, Tray, nativeImage, dialog, shell, Menu, nativeTheme } = require('electron');
 const { autoUpdater } = require('electron-updater');
+const log = require('electron-log');
+const path = require('path');
+const fs = require('fs');
+const https = require('https');
+const os = require('os');
 
 let mainWindow; // Variável para armazenar a janela principal
 
@@ -33,110 +37,58 @@ function createWindow() {
     });
 
     // Verificar atualizações assim que a janela for criada
-    checkForUpdates();
+    autoUpdater.checkForUpdates();
 }
 
-// Função para monitorar o progresso de download
+// Manipuladores de atualização
+function handleUpdateChecking() {
+  log.log('Checking for updates.');
+}
+  
+function handleUpdateAvailable(info) {
+  log.log('Update available.');
+}
+  
 function handleDownloadProgress(progressObj) {
-    const message = `Velocidade: ${(progressObj.bytesPerSecond / 1024).toFixed(2)} KB/s - ${Math.floor(progressObj.percent)}% 
-    (${(progressObj.transferred / 1024).toFixed(2)} KB de ${(progressObj.total / 1024).toFixed(2)} KB)`;
+  const message = `Downloading update. Speed: ${progressObj.bytesPerSecond} - ${~~progressObj.percent}% [${progressObj.transferred}/${progressObj.total}]`;
+  log.log(message);
 
-    // Atualizar a janela do SweetAlert2 com o progresso, se o alerta estiver ativo
-    if (Swal.isVisible()) {
-        Swal.update({
-            title: 'Baixando atualização',
-            html: message,
-            allowOutsideClick: false,
-            showConfirmButton: false, // Remove o botão de confirmação
-            onBeforeOpen: () => Swal.showLoading() // Mantém o loading ativo
-        });
-    }
+  const swalMessage = `Swal.fire({
+    title: 'Baixando atualização',
+    html: '${message}',
+    allowOutsideClick: false,
+    onBeforeOpen: () => Swal.showLoading()
+  });`;
+
+  mainWindow.webContents.executeJavaScript(swalMessage);
 }
-
-// Função para configurar e checar atualizações
-function checkForUpdates() {
-    // Configurações do autoUpdater
-    autoUpdater.autoDownload = false; // Para solicitar confirmação antes de baixar a atualização
-
-    // Notificação de que está checando por atualizações
-    autoUpdater.on('checking-for-update', () => {
-        Swal.fire({
-            title: 'Verificando atualizações',
-            text: 'Aguarde enquanto verificamos se há novas atualizações.',
-            allowOutsideClick: false,
-            showConfirmButton: false,
-            onBeforeOpen: () => Swal.showLoading()
-        });
-    });
-
-    // Notificação de nova atualização disponível
-    autoUpdater.on('update-available', () => {
-        Swal.fire({
-            title: 'Nova atualização disponível!',
-            text: 'Deseja baixar a atualização agora?',
-            icon: 'info',
-            showCancelButton: true,
-            confirmButtonText: 'Sim, baixar!',
-            cancelButtonText: 'Não'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                autoUpdater.downloadUpdate();
-            } else {
-                Swal.fire({
-                    title: 'Atualização cancelada',
-                    text: 'Você pode verificar por atualizações mais tarde.',
-                    icon: 'info',
-                    confirmButtonText: 'OK'
-                });
-            }
-        });
-    });
-
-    // Monitorar o progresso do download
-    autoUpdater.on('download-progress', (progressObj) => {
-        handleDownloadProgress(progressObj);
-    });
-
-    // Atualização já baixada e pronta para instalação
-    autoUpdater.on('update-downloaded', () => {
-        Swal.fire({
-            title: 'Atualização pronta!',
-            text: 'A atualização foi baixada. O aplicativo será reiniciado para aplicar a atualização.',
-            icon: 'success',
-            showCancelButton: false,
-            confirmButtonText: 'Reiniciar agora'
-        }).then(() => {
-            autoUpdater.quitAndInstall(); // Reinicia e instala a nova versão
-        });
-    });
-
-    // Erro ao verificar atualizações
-    autoUpdater.on('error', (err) => {
-        console.error('Erro ao verificar atualizações:', err);
-        dialog.showErrorBox('Erro ao verificar atualizações', err == null ? "Erro desconhecido" : (err.stack || err).toString());
-        Swal.fire({
-            title: 'Erro',
-            text: 'Ocorreu um erro ao verificar atualizações. Tente novamente mais tarde.',
-            icon: 'error'
-        });
-    });
-
-    // Sem atualizações disponíveis
-    autoUpdater.on('update-not-available', () => {
-        Swal.fire({
-            title: 'Sem atualizações disponíveis',
-            text: 'Você já está usando a versão mais recente.',
-            icon: 'info',
-            confirmButtonText: 'OK'
-        });
-    });
-
-    // Verificar atualizações automaticamente ao iniciar
-    autoUpdater.checkForUpdates().catch(err => {
-        console.error('Erro ao verificar atualizações:', err);
-        dialog.showErrorBox('Erro ao verificar atualizações', err == null ? "Erro desconhecido" : (err.stack || err).toString());
-    });
+  
+function handleUpdateError(err) {
+  log.log(`Update check failed: ${err.toString()}`);
 }
+  
+function handleUpdateNotAvailable(info) {
+  log.log(`Não há atualizações disponíveis para o launcher.`);
+}
+  
+function handleUpdateDownloaded(info) {
+  const swalMessage = `Swal.fire({
+    title: 'Reiniciando o aplicativo',
+    html: 'Aguente firme, reiniciando o aplicativo para atualização!',
+    allowOutsideClick: false,
+    onBeforeOpen: () => Swal.showLoading()
+  });`;
+  
+  mainWindow.webContents.executeJavaScript(swalMessage);
+  autoUpdater.quitAndInstall();
+}
+  
+autoUpdater.on('checking-for-update', handleUpdateChecking);
+autoUpdater.on('update-available', handleUpdateAvailable);
+autoUpdater.on('download-progress', handleDownloadProgress);
+autoUpdater.on('error', handleUpdateError);
+autoUpdater.on('update-not-available', handleUpdateNotAvailable);
+autoUpdater.on('update-downloaded', handleUpdateDownloaded);
 
 // Evento que é chamado quando o aplicativo está pronto
 app.whenReady().then(createWindow);
