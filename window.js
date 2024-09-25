@@ -1,5 +1,7 @@
 const { app, BrowserWindow, shell } = require('electron');
 const path = require('path');
+const { autoUpdater } = require('electron-updater');
+const log = require('electron-log');
 
 class MainWindow {
     constructor() {
@@ -33,5 +35,54 @@ class MainWindow {
         }
     }
 }
+
+// Manipuladores de atualização
+function handleUpdateChecking() {
+  log.log('Checking for updates.');
+}
+    
+function handleUpdateAvailable(info) {
+  log.log('Update available.');
+}
+    
+function handleDownloadProgress(progressObj) {
+  const message = `Downloading update. Speed: ${progressObj.bytesPerSecond} - ${~~progressObj.percent}% [${progressObj.transferred}/${progressObj.total}]`;
+  log.log(message);
+  const swalMessage = `Swal.fire({
+    title: 'Baixando atualização',
+    html: '${message}',
+    allowOutsideClick: false,
+    onBeforeOpen: () => Swal.showLoading()
+  });`;
+ 
+  mainWindow.webContents.executeJavaScript(swalMessage);
+}
+    
+function handleUpdateError(err) {
+  log.log(`Update check failed: ${err.toString()}`);
+}
+    
+function handleUpdateNotAvailable(info) {
+  log.log(`Não há atualizações disponíveis para o launcher.`);
+}
+    
+function handleUpdateDownloaded(info) {
+  const swalMessage = `Swal.fire({
+    title: 'Reiniciando o aplicativo',
+    html: 'Aguente firme, reiniciando o aplicativo para atualização!',
+    allowOutsideClick: false,
+    onBeforeOpen: () => Swal.showLoading()
+  });`;
+    
+  mainWindow.webContents.executeJavaScript(swalMessage);
+  autoUpdater.quitAndInstall();
+}
+    
+autoUpdater.on('checking-for-update', handleUpdateChecking);
+autoUpdater.on('update-available', handleUpdateAvailable);
+autoUpdater.on('download-progress', handleDownloadProgress);
+autoUpdater.on('error', handleUpdateError);
+autoUpdater.on('update-not-available', handleUpdateNotAvailable);
+autoUpdater.on('update-downloaded', handleUpdateDownloaded);
 
 module.exports = MainWindow;
