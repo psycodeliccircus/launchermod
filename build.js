@@ -70,7 +70,7 @@ class Index {
                     ]
                 },
                 appImage: {
-                    artifactName: "Launcher-Mods-${arch}.AppImage",
+                    artifactName: "Launcher-Mods_${version}-${arch}-linux.AppImage",
                     category: "Game",
                     desktop: "./LauncherMods.desktop",
                     license: "./eula.txt"
@@ -81,7 +81,7 @@ class Index {
                     desktop: "./LauncherMods.desktop"
                 },
                 dmg: {
-                    artifactName: "Launcher-Mods-${arch}.dmg",
+                    artifactName: "Launcher-Mods_${version}-${arch}.dmg",
                     title: "Launcher Mods Installer"
                 },
                 nsis: {

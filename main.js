@@ -120,9 +120,21 @@ function handleUpdateAvailable(info) {
     log.log('Update available.');
 }
 
+function formatBytes(bytes) {
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    if (bytes === 0) return '0 Bytes';
+    const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+    return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`;
+}
+
 function handleDownloadProgress(progressObj) {
-    const message = `Downloading update. Speed: ${progressObj.bytesPerSecond} - ${~~progressObj.percent}% [${progressObj.transferred}/${progressObj.total}]`;
+    const transferredFormatted = formatBytes(progressObj.transferred);
+    const totalFormatted = formatBytes(progressObj.total);
+    const speedFormatted = formatBytes(progressObj.bytesPerSecond);
+    
+    const message = `Downloading update. Speed: ${speedFormatted}/s - ${~~progressObj.percent}% [${transferredFormatted}/${totalFormatted}]`;
     log.log(message);
+
     const swalMessage = `Swal.fire({
         title: 'Baixando atualização',
         html: '${message}',
