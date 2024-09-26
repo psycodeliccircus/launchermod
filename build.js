@@ -36,6 +36,8 @@ class Index {
                             arch: ["x64", "arm64"]
                         }
                     ],
+                    entitlements: "build/entitlements.plist",
+                    entitlementsInherit: "build/entitlementsInherit.plist",
                     extendInfo: "launchermods"
                 },
                 win: {
@@ -93,7 +95,7 @@ class Index {
                     createStartMenuShortcut: true
                 },
                 extraResources: [
-                    "./build/icon.png"
+                    "build/icon.png"
                 ],
                 protocols: {
                     name: "launchermod",
