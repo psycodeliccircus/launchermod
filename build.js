@@ -14,7 +14,7 @@ class Index {
                 productName: 'Launcher Mods',
                 executableName: 'launchermods',
                 copyright: "Copyright © 1984-2024 Launcher Mods - Dev by RenildoMarcio",
-                forceCodeSigning: true,
+                //forceCodeSigning: true,
                 asar: true,
                 files: ["**/*", "package.json", "LICENSE.md"],
                 directories: { output: "dist" },
