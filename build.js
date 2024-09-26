@@ -9,6 +9,7 @@ class Index {
     async build() {
         builder.build({
             config: {
+                $schema: "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
                 generateUpdatesFilesForAllChannels: false,
                 appId: 'com.github.psycodeliccircus.launchermod',
                 productName: 'launchermod',
@@ -27,13 +28,11 @@ class Index {
                     target: [
                         {
                         target: "nsis",
-                        arch: ["x64"],
-                        artifactName: "${productName}-Windows-${version}-Setup.${ext}"
+                        arch: ["x64"]
                         },
                         {
                         target: "portable",
-                        arch: ["x64"],
-                        artifactName: "${productName}-Windows-${version}-Portable.${ext}"
+                        arch: ["x64"]
                         }
                     ],
                 },
