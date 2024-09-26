@@ -15,7 +15,7 @@ class Index {
                 productName: 'launchermod',
                 icon: "./build/icon.ico",
                 copyright: "Copyright © 1984-2024 Launcher Mods - Dev by RenildoMarcio",
-                artifactName: "${productName}-${os}-${arch}-${target}-${version}.${ext}",
+                artifactName: "${productName}-${os}-${arch}-${version}.${ext}",
                 files: ["**/*", "package.json", "LICENSE.md"],
                 directories: { "output": "dist" },
                 compression: 'maximum',
@@ -28,14 +28,16 @@ class Index {
                     icon: "./build/icon.ico",
                     target: [
                         {
-                        target: "nsis",
-                        arch: ["x64"]
+                            target: "nsis",
+                            arch: ["x64"],
+                            artifactName: "${productName}-${os}-${arch}-nsis-${version}.${ext}"
                         },
                         {
-                        target: "portable",
-                        arch: ["x64"]
+                            target: "portable",
+                            arch: ["x64"],
+                            artifactName: "${productName}-${os}-${arch}-portable-${version}.${ext}"
                         }
-                    ],
+                    ]
                 },
                 nsis: {
                     installerIcon: "./build/icon.ico",
