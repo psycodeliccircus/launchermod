@@ -15,6 +15,7 @@ class Index {
                 productName: 'launchermod',
                 icon: "./build/icon.ico",
                 copyright: "Copyright © 1984-2024 Launcher Mods - Dev by RenildoMarcio",
+                artifactName: "${productName}-${os}-${arch}-${target}-${version}.${ext}",
                 files: ["**/*", "package.json", "LICENSE.md"],
                 directories: { "output": "dist" },
                 compression: 'maximum',
