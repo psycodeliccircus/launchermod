@@ -1,110 +1,134 @@
-const builder = require('electron-builder')
-const nodeFetch = require('node-fetch')
+const builder = require('electron-builder');
+const nodeFetch = require('node-fetch');
 const fs = require("fs");
 const png2icons = require('png2icons');
 const Jimp = require('jimp');
-const { preductname } = require('./package.json')
+const { productName } = require('./package.json');
 
 class Index {
     async build() {
         builder.build({
             config: {
                 $schema: "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-                generateUpdatesFilesForAllChannels: false,
                 appId: 'com.github.psycodeliccircus.launchermod',
-                productName: 'launchermod',
-                icon: "./build/icon.ico",
+                productName: 'Launcher Mods',
+                executableName: 'launchermods',
                 copyright: "Copyright © 1984-2024 Launcher Mods - Dev by RenildoMarcio",
-                artifactName: "${productName}-${os}-${arch}-${version}.${ext}",
-                files: ["**/*", "package.json", "LICENSE.md"],
-                directories: { "output": "dist" },
-                compression: 'maximum',
+                forceCodeSigning: true,
                 asar: true,
+                files: ["**/*", "package.json", "LICENSE.md"],
+                directories: { output: "dist" },
+                compression: 'maximum',
                 publish: [{
                     provider: "github",
                     releaseType: 'release',
                 }],
+                mac: {
+                    category: "public.app-category.games",
+                    icon: "./build/icon.icns",
+                    target: [
+                        {
+                            target: "dmg",
+                            arch: ["x64", "arm64"]
+                        },
+                        {
+                            target: "zip",
+                            arch: ["x64", "arm64"]
+                        }
+                    ],
+                    extendInfo: "launchermods"
+                },
                 win: {
                     icon: "./build/icon.ico",
+                    publisherName: "Launcher Mods",
                     target: [
                         {
                             target: "nsis",
-                            arch: ["x64"],
-                            artifactName: "${productName}-${os}-${arch}-nsis-${version}.${ext}"
+                            arch: ["x64"]
                         },
                         {
                             target: "portable",
-                            arch: ["x64"],
-                            artifactName: "${productName}-${os}-${arch}-portable-${version}.${ext}"
+                            arch: ["x64"]
                         }
                     ]
                 },
-                nsis: {
-                    installerIcon: "./build/icon.ico",
-                    uninstallerIcon: "./build/uninstall.ico",
-                    oneClick: false,
-                    allowToChangeInstallationDirectory: true,
-                    runAfterFinish: true,
-                    createStartMenuShortcut: true,
-                    packElevateHelper: true,
-                    createDesktopShortcut: true,
-                    shortcutName: "Launcher Mods",
+                linux: {
+                    category: "Game",
+                    artifactName: "Launcher Mods",
+                    desktop: "launchermods.desktop",
+                    synopsis: "Sistema Launcher Mods!",
+                    description: "Sistema Launcher Mods!",
+                    icon: "./build/icon.png",
+                    executableName: "launchermods",
+                    target: [
+                        {
+                            target: "AppImage",
+                            arch: ["x64"]
+                        }
+                    ]
+                },
+                appImage: {
+                    artifactName: "Launcher-Mods-${arch}.AppImage",
+                    category: "Game",
+                    desktop: "./LauncherMods.desktop",
                     license: "./eula.txt"
                 },
-                mac: {
-                    icon: "./build/icon.icns",
-                    category: "public.app-category.games",
-                    target: [{
-                        target: "dmg",
-                        arch: ["x64", "arm64"]
-                    }],
-                    entitlements: "build/entitlements.plist",
-                    entitlementsInherit: "build/entitlementsInherit.plist"
+                deb: {
+                    artifactName: "Launcher-Mods_${version}-1_${arch}.deb",
+                    category: "Game",
+                    desktop: "./LauncherMods.desktop"
                 },
-                linux: {
-                    icon: "./build/icon.png",
-                    target: [{
-                        target: "AppImage",
-                        arch: ["x64"]
-                    }, {
-                        target: "tar.gz",
-                        arch: ["x64"]
-                    }]
+                dmg: {
+                    artifactName: "Launcher-Mods-${arch}.dmg",
+                    title: "Launcher Mods Installer"
                 },
-                // Aqui é onde você adiciona o extraResources
+                nsis: {
+                    license: "./eula.txt",
+                    oneClick: false,
+                    perMachine: false,
+                    allowToChangeInstallationDirectory: true,
+                    installerIcon: "./build/icon.ico",
+                    uninstallerIcon: "./build/uninstall.ico",
+                    createDesktopShortcut: true,
+                    createStartMenuShortcut: true
+                },
                 extraResources: [
-                    {
-                        from: "build/icon.png", // Caminho da sua pasta de ícones ou qualquer outro arquivo
-                        to: "build/icon.png" // O destino no diretório final
-                    }
-                ]
+                    "./build/icon.png"
+                ],
+                protocols: {
+                    name: "launchermod",
+                    schemes: [
+                        "launchermods",
+                        "launchermod"
+                    ]
+                }
             }
         }).then(() => {
-            console.log('A build está concluída')
+            console.log('A build está concluída');
         }).catch(err => {
-            console.error('Erro durante a build!', err)
-        })
+            console.error('Erro durante a build!', err);
+        });
     }
 
     async iconSet(url) {
-        let Buffer = await nodeFetch(url)
-        if (Buffer.status == 200) {
-            Buffer = await Buffer.buffer()
-            const image = await Jimp.read(Buffer);
-            Buffer = await image.resize(256, 256).getBufferAsync(Jimp.MIME_PNG)
-            fs.writeFileSync("build/icon.icns", png2icons.createICNS(Buffer, png2icons.BILINEAR, 0));
-            fs.writeFileSync("build/icon.ico", png2icons.createICO(Buffer, png2icons.HERMITE, 0, false));
-            fs.writeFileSync("build/icon.png", Buffer);
+        let response = await nodeFetch(url);
+        if (response.status === 200) {
+            let buffer = await response.buffer();
+            const image = await Jimp.read(buffer);
+            buffer = await image.resize(256, 256).getBufferAsync(Jimp.MIME_PNG);
+            fs.writeFileSync("build/icon.icns", png2icons.createICNS(buffer, png2icons.BILINEAR, 0));
+            fs.writeFileSync("build/icon.ico", png2icons.createICO(buffer, png2icons.HERMITE, 0, false));
+            fs.writeFileSync("build/icon.png", buffer);
         } else {
-            console.log('connection error')
+            console.log('Erro de conexão');
         }
     }
 }
 
 process.argv.forEach(val => {
     if (val.startsWith('--icon')) {
-        return new Index().iconSet(val.split('=')[1])
+        new Index().iconSet(val.split('=')[1]);
     } else if (val.startsWith('--build')) {
-        new Index().build()
+        new Index().build();
     }
 });
