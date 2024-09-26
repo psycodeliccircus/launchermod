@@ -28,12 +28,12 @@ class Index {
                         {
                         target: "nsis",
                         arch: ["x64"],
-                        artifactName: "${productName}-installer.exe"
+                        artifactName: "${productName}-Windows-${version}-Setup.${ext}"
                         },
                         {
                         target: "portable",
                         arch: ["x64"],
-                        artifactName: "${productName}-portable.exe"
+                        artifactName: "${productName}-Windows-${version}-Portable.${ext}"
                         }
                     ],
                 },
@@ -54,8 +54,7 @@ class Index {
                     category: "public.app-category.games",
                     target: [{
                         target: "dmg",
-                        arch: ["x64", "arm64"],
-                        artifactName: "${productName}-mac-${arch}.dmg"
+                        arch: ["x64", "arm64"]
                     }],
                     entitlements: "build/entitlements.plist",
                     entitlementsInherit: "build/entitlementsInherit.plist"
@@ -64,12 +63,10 @@ class Index {
                     icon: "./build/icon.png",
                     target: [{
                         target: "AppImage",
-                        arch: ["x64"],
-                        artifactName: "${productName}-linux.AppImage"
+                        arch: ["x64"]
                     }, {
                         target: "tar.gz",
-                        arch: ["x64"],
-                        artifactName: "${productName}-linux.tar.gz"
+                        arch: ["x64"]
                     }]
                 },
                 // Aqui é onde você adiciona o extraResources
