@@ -29,7 +29,7 @@ class Index {
                     target: [
                         {
                         target: "nsis",
-                        arch: ["x64"]
+                        arch: ["x64", "x32"]
                         }
                     ],
                 },
@@ -75,6 +75,9 @@ class Index {
                     category: "Game",
                     desktop: "./LauncherMod.desktop",
                     license: "./eula.txt"
+                },
+                tar_gz: {
+                    artifactName: "${productName}-${os}-${arch}.tar.gz",
                 },
                 // Aqui é onde você adiciona o extraResources
                 extraResources: [
