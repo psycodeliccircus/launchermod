@@ -64,7 +64,7 @@ class Index {
                     icon: "./build/icon.png",
                     target: [{
                         target: "AppImage",
-                        arch: ["x64"]
+                        arch: ["x64", "arm64", "armv7l", "ia32", "universal"]
                     }, {
                         target: "tar.gz",
                         arch: ["x64"]
@@ -75,9 +75,6 @@ class Index {
                     category: "Game",
                     desktop: "./LauncherMod.desktop",
                     license: "./eula.txt"
-                },
-                tar_gz: {
-                    artifactName: "${productName}-${os}-${arch}.tar.gz",
                 },
                 // Aqui é onde você adiciona o extraResources
                 extraResources: [
