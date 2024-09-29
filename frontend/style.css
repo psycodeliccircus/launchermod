@@ -694,7 +694,21 @@ body{
 
 a {
     text-decoration: none !important;
+    color: #eee;
 }
 a:hover {
     text-decoration: none !important;
+    color: #eee;
+}
+
+.progress {
+    display: -ms-flexbox;
+    display: flex;
+    height: 1rem;
+    overflow: hidden;
+    line-height: 0;
+    font-size: .75rem;
+    color: var(--light);
+    background-color: var(--light);
+    border-radius: .25rem;
 }

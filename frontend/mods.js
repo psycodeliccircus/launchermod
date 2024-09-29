@@ -2,6 +2,15 @@ let mods = [];
 const modsPerPage = 10;
 let currentPage = 1;
 
+// Mapeamento de imagens para cada jogo
+const gameImages = {
+    'ETS2': 'https://chevereto.renildomarcio.com.br/images/2024/09/28/6126a8c3005e0305691e1612c2687063.png',
+    'ats': 'https://chevereto.renildomarcio.com.br/images/2024/09/28/c542f9de6ff5f021f1946ddbe8c39c97.md.png',
+    'gta5': 'https://chevereto.renildomarcio.com.br/images/2024/09/28/16eac7ff051e1f71d8d1f3d8c1b8de7f.md.png',
+    // Adicione mais jogos e caminhos de imagem conforme necessário
+};
+
+// Carrega os mods do backend
 async function loadMods() {
     try {
         const response = await fetch('https://api.renildomarcio.com.br/backend/get_mods.php');
@@ -12,11 +21,11 @@ async function loadMods() {
             createPagination();
         }
     } catch (error) {
-        console.error('Erro ao buscar mods:', error);
         displayErrorMessage('Erro ao carregar os mods. Tente novamente mais tarde.');
     }
 }
 
+// Exibe os mods na tabela
 function displayMods() {
     const modList = document.getElementById('modList');
     modList.innerHTML = ''; // Limpa a tabela
@@ -26,128 +35,154 @@ function displayMods() {
     const paginatedMods = mods.slice(start, end);
 
     if (paginatedMods.length === 0) {
-        const emptyMessage = document.createElement('tr');
-        emptyMessage.innerHTML = '<td colspan="3" style="text-align: center;">Nenhum mod disponível no momento.</td>';
-        modList.appendChild(emptyMessage);
+        displayErrorMessage('Nenhum mod disponível no momento.');
         return;
     }
 
     paginatedMods.forEach(mod => {
         const row = document.createElement('tr');
 
-        const gameCell = document.createElement('td');
-        gameCell.textContent = mod.game;
-        row.appendChild(gameCell);
+        // Verificar se existe uma imagem para o jogo
+        const gameImage = gameImages[mod.game] || 'https://chevereto.renildomarcio.com.br/images/2024/09/28/07f8d8b3a02baab83b45f8f191e95006.md.png'; // Imagem padrão se não encontrar
 
-        const nameCell = document.createElement('td');
-        nameCell.textContent = mod.name;
-        row.appendChild(nameCell);
-
-        const downloadCell = document.createElement('td');
-        const downloadLink = document.createElement('a');
-        downloadLink.href = mod.download_link;
-        downloadLink.className = 'report';
-        downloadLink.innerHTML = `
-            <i class="bx bx-cloud-download"></i>
-            <span>Download</span>
+        row.innerHTML = `
+            <td>
+                <img src="${gameImage}" alt="${mod.game}" style="width: 50px; height: auto;">
+            </td>
+            <td>${mod.game}</td>
+            <td>${mod.name}</td>
+            <td>
+                <a href="#" class="report download-link">
+                    <i class="bx bx-cloud-download"></i>
+                    <span>Download</span>
+                </a>
+                <div class="progress mt-2" style="display: none;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                </div>
+            </td>
         `;
-        downloadCell.appendChild(downloadLink);
-        row.appendChild(downloadCell);
+
+        // Evento de clique no link de download
+        const downloadLink = row.querySelector('.download-link');
+        const progressBarContainer = row.querySelector('.progress');
+        const progressBar = row.querySelector('.progress-bar');
+
+        downloadLink.addEventListener('click', (event) => {
+            event.preventDefault(); 
+            startDownload(mod.download_link, downloadLink, progressBarContainer, progressBar);
+        });
 
         modList.appendChild(row);
     });
 }
 
-function displayErrorMessage(message) {
-    const modList = document.getElementById('modList');
-    modList.innerHTML = ''; // Limpa a tabela
+// Lida com a lógica do download
+function startDownload(downloadLink, linkElement, progressBarContainer, progressBar) {
+    progressBarContainer.style.display = ''; 
+    progressBar.style.width = '0%'; 
+    progressBar.textContent = '0%';
 
-    const errorMessage = document.createElement('tr');
-    errorMessage.innerHTML = `<td colspan="3" style="text-align: center; color: red;">${message}</td>`;
-    modList.appendChild(errorMessage);
+    // Desabilita o link de download
+    linkElement.style.pointerEvents = 'none'; 
+    linkElement.style.opacity = '0.5';
+
+    console.log('Iniciando download de:', downloadLink);
+    window.electronAPI.startDownload(downloadLink);
+
+    // Atualiza o progresso
+    window.electronAPI.onDownloadProgress((progress) => {
+        const percent = Math.round(progress.percent); 
+        progressBar.style.width = `${percent}%`; 
+        progressBar.setAttribute('aria-valuenow', percent); 
+        progressBar.textContent = `${percent}%`; 
+    });
+
+    // Conclui o download
+    window.electronAPI.onDownloadComplete(() => {
+        progressBar.className = 'progress-bar progress-bar-striped bg-success';
+        progressBar.style.width = '100%'; 
+        progressBar.textContent = 'Download Completo!'; 
+
+        // Oculta a barra após 5 segundos
+        setTimeout(() => {
+            progressBarContainer.style.display = 'none'; 
+        }, 5000);
+    });
 }
 
+// Exibe uma mensagem de erro
+function displayErrorMessage(message) {
+    const modList = document.getElementById('modList');
+    modList.innerHTML = `
+        <tr>
+            <td colspan="4" class="text-center text-danger">${message}</td>
+        </tr>
+    `;
+}
+
+// Cria a paginação
 function createPagination() {
     const pagination = document.getElementById('pagination');
     pagination.innerHTML = ''; // Limpa a paginação existente
 
     const totalPages = Math.ceil(mods.length / modsPerPage);
-
-    // Criando a estrutura de navegação
     const nav = document.createElement('nav');
-    nav.setAttribute('aria-label', 'Page navigation example');
-
     const ul = document.createElement('ul');
-    ul.className = 'pagination justify-content-cente';
+    ul.className = 'pagination justify-content-center';
 
     // Botão "Anterior"
-    const prevItem = document.createElement('li');
-    prevItem.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
-    const prevButton = document.createElement('a');
-    prevButton.className = 'page-link';
-    prevButton.href = '#';
-    prevButton.textContent = '&laquo;';
-    prevButton.setAttribute('tabindex', '-1');
-    prevButton.setAttribute('aria-disabled', currentPage === 1);
-    prevButton.addEventListener('click', (event) => {
-        event.preventDefault();
+    ul.appendChild(createPaginationButton('«', currentPage === 1, () => {
         if (currentPage > 1) {
             currentPage--;
             updatePagination();
         }
-    });
-    prevItem.appendChild(prevButton);
-    ul.appendChild(prevItem);
+    }));
 
-    // Números das páginas
+    // Números de página
     for (let i = 1; i <= totalPages; i++) {
-        ul.appendChild(createPageItem(i, i === currentPage));
+        ul.appendChild(createPaginationButton(i, i === currentPage, () => {
+            currentPage = i;
+            updatePagination();
+        }));
     }
 
     // Botão "Próximo"
-    const nextItem = document.createElement('li');
-    nextItem.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
-    const nextButton = document.createElement('a');
-    nextButton.className = 'page-link';
-    nextButton.href = '#';
-    nextButton.textContent = '&raquo;';
-    nextButton.addEventListener('click', (event) => {
-        event.preventDefault();
+    ul.appendChild(createPaginationButton('»', currentPage === totalPages, () => {
         if (currentPage < totalPages) {
             currentPage++;
             updatePagination();
         }
-    });
-    nextItem.appendChild(nextButton);
-    ul.appendChild(nextItem);
+    }));
 
-    // Adiciona a lista à navegação
     nav.appendChild(ul);
     pagination.appendChild(nav);
 }
 
-function createPageItem(pageNumber, isActive) {
-    const pageItem = document.createElement('li');
-    pageItem.className = `page-item ${isActive ? 'active' : ''}`;
-    const pageLink = document.createElement('a');
-    pageLink.className = 'page-link';
-    pageLink.href = '#';
-    pageLink.textContent = pageNumber;
-    pageLink.addEventListener('click', (event) => {
-        event.preventDefault();
-        currentPage = pageNumber;
-        updatePagination();
-    });
-    pageItem.appendChild(pageLink);
-    return pageItem;
+// Cria um item de botão da paginação
+function createPaginationButton(text, isDisabledOrActive, onClick) {
+    const li = document.createElement('li');
+    li.className = `page-item ${isDisabledOrActive ? (typeof text === 'number' ? 'active' : 'disabled') : ''}`;
+    const a = document.createElement('a');
+    a.className = 'page-link';
+    a.href = '#';
+    a.textContent = text;
+    if (!isDisabledOrActive) {
+        a.addEventListener('click', (event) => {
+            event.preventDefault();
+            onClick();
+        });
+    }
+    li.appendChild(a);
+    return li;
 }
 
+// Atualiza a exibição de mods e a paginação
 function updatePagination() {
     createPagination();
     displayMods();
 }
 
-// Chama loadMods apenas na página de mods
+// Chama a função de carregar mods quando estiver na página de mods
 if (window.location.pathname.endsWith('mods.html')) {
     loadMods();
 }

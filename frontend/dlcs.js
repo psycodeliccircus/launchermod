@@ -1,156 +1,170 @@
 let dlcs = [];
-const dlcsPerPage = 10; // Número de DLCs por página
-let currentDLCPage = 1; // Página atual dos DLCs
+const dlcsPerPage = 10;
+let currentDLCPage = 1;
 
+// Carrega os DLCs
 async function loadDLCs() {
     try {
         const response = await fetch('https://api.renildomarcio.com.br/backend/get_dlcs.php');
         const data = await response.json();
-        dlcs = Array.isArray(data) && data.length > 0 ? data : []; // Armazena todos os DLCs
+        dlcs = Array.isArray(data) && data.length > 0 ? data : [];
         displayDLCs();
-        createDLCPagination();
+        if (dlcs.length > 0) {
+            createDLCPagination();
+        }
     } catch (error) {
-        console.error('Erro ao buscar DLCs:', error);
         displayErrorMessage('Erro ao carregar DLCs. Tente novamente mais tarde.');
     }
 }
 
+// Exibe os DLCs na tabela
 function displayDLCs() {
     const dlcList = document.getElementById('dlcList');
-    dlcList.innerHTML = ''; // Limpa a lista de DLCs
+    dlcList.innerHTML = ''; // Limpa a lista
 
     const start = (currentDLCPage - 1) * dlcsPerPage;
     const end = start + dlcsPerPage;
     const paginatedDLCs = dlcs.slice(start, end);
 
     if (paginatedDLCs.length === 0) {
-        const emptyMessage = document.createElement('tr');
-        emptyMessage.innerHTML = '<td colspan="2" style="text-align: center;">Nenhum DLC disponível no momento.</td>';
-        dlcList.appendChild(emptyMessage);
+        displayErrorMessage('Nenhum DLC disponível no momento.');
         return;
     }
 
     paginatedDLCs.forEach(dlc => {
         const row = document.createElement('tr');
 
-        const nameCell = document.createElement('td');
-        nameCell.textContent = dlc.name; // Acessa o campo 'name'
-        row.appendChild(nameCell);
-
-        const downloadCell = document.createElement('td');
-        const downloadLink = document.createElement('a');
-        downloadLink.href = dlc.download_link; // Define o link para download
-        downloadLink.className = 'report'; // Adiciona a classe para estilo
-
-        downloadLink.innerHTML = `
-            <i class="bx bx-cloud-download"></i>
-            <span>Download</span>
+        row.innerHTML = `
+            <td>${dlc.name}</td>
+            <td>
+                <a href="#" class="report download-link">
+                    <i class="bx bx-cloud-download"></i>
+                    <span>Download</span>
+                </a>
+                <div class="progress mt-2" style="display: none;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                </div>
+            </td>
         `;
 
-        downloadCell.appendChild(downloadLink);
-        row.appendChild(downloadCell);
+        const downloadLink = row.querySelector('.download-link');
+        const progressBarContainer = row.querySelector('.progress');
+        const progressBar = row.querySelector('.progress-bar');
+
+        downloadLink.addEventListener('click', (event) => {
+            event.preventDefault();
+            startDownload(dlc.download_link, downloadLink, progressBarContainer, progressBar);
+        });
 
         dlcList.appendChild(row);
     });
 }
 
-function displayErrorMessage(message) {
-    const dlcList = document.getElementById('dlcList');
-    dlcList.innerHTML = ''; // Limpa a lista de DLCs
+// Lida com a lógica do download
+function startDownload(downloadLink, linkElement, progressBarContainer, progressBar) {
+    progressBarContainer.style.display = 'block';
+    progressBar.style.width = '0%';
+    progressBar.textContent = '0%';
 
-    const errorMessage = document.createElement('tr');
-    errorMessage.innerHTML = `<td colspan="2" style="text-align: center; color: red;">${message}</td>`;
-    dlcList.appendChild(errorMessage);
+    // Desabilita o link de download
+    linkElement.style.pointerEvents = 'none';
+    linkElement.style.opacity = '0.5';
+
+    console.log('Iniciando download de:', downloadLink);
+    window.electronAPI.startDownload(downloadLink);
+
+    // Atualiza o progresso
+    window.electronAPI.onDownloadProgress((progress) => {
+        const percent = Math.round(progress.percent);
+        progressBar.style.width = `${percent}%`;
+        progressBar.setAttribute('aria-valuenow', percent);
+        progressBar.textContent = `${percent}%`;
+    });
+
+    // Conclui o download
+    window.electronAPI.onDownloadComplete(() => {
+        progressBar.className = 'progress-bar progress-bar-striped bg-success';
+        progressBar.style.width = '100%';
+        progressBar.textContent = 'Download Completo!';
+
+        // Oculta a barra de progresso após 5 segundos
+        setTimeout(() => {
+            progressBarContainer.style.display = 'none';
+        }, 5000);
+    });
 }
 
+// Exibe uma mensagem de erro
+function displayErrorMessage(message) {
+    const dlcList = document.getElementById('dlcList');
+    dlcList.innerHTML = `
+        <tr>
+            <td colspan="2" class="text-center text-danger">${message}</td>
+        </tr>
+    `;
+}
+
+// Cria a paginação
 function createDLCPagination() {
     const pagination = document.getElementById('dlcPagination');
-    pagination.innerHTML = ''; // Limpa a paginação existente
-
-    // Verifique se há DLCs
-    if (dlcs.length === 0) {
-        const noDLCSMessage = document.createElement('div');
-        noDLCSMessage.textContent = 'Nenhum DLC disponível no momento.';
-        pagination.appendChild(noDLCSMessage);
-        return; // Não crie mais elementos de paginação se não houver DLCs
-    }
+    pagination.innerHTML = ''; // Limpa a paginação
 
     const totalPages = Math.ceil(dlcs.length / dlcsPerPage);
-
-    // Criando a estrutura de navegação
     const nav = document.createElement('nav');
-    nav.setAttribute('aria-label', 'Page navigation example');
-
     const ul = document.createElement('ul');
     ul.className = 'pagination justify-content-center';
 
     // Botão "Anterior"
-    createPageButton('«', currentDLCPage === 1, () => {
+    ul.appendChild(createPaginationButton('«', currentDLCPage === 1, () => {
         if (currentDLCPage > 1) {
             currentDLCPage--;
             updateDLCPagination();
         }
-    }, ul);
+    }));
 
-    // Números das páginas
+    // Números de página
     for (let i = 1; i <= totalPages; i++) {
-        createPageItem(i, i === currentDLCPage, ul);
+        ul.appendChild(createPaginationButton(i, i === currentDLCPage, () => {
+            currentDLCPage = i;
+            updateDLCPagination();
+        }));
     }
 
     // Botão "Próximo"
-    createPageButton('»', currentDLCPage === totalPages, () => {
+    ul.appendChild(createPaginationButton('»', currentDLCPage === totalPages, () => {
         if (currentDLCPage < totalPages) {
             currentDLCPage++;
             updateDLCPagination();
         }
-    }, ul);
+    }));
 
-    // Adiciona a lista à navegação
     nav.appendChild(ul);
     pagination.appendChild(nav);
 }
 
-function createPageItem(pageNumber, isActive, ul) {
-    const pageItem = document.createElement('li');
-    pageItem.className = `page-item ${isActive ? 'active' : ''}`;
-    const pageLink = document.createElement('a');
-    pageLink.className = 'page-link';
-    pageLink.href = '#';
-    pageLink.textContent = pageNumber;
-    pageLink.addEventListener('click', (event) => {
-        event.preventDefault();
-        currentDLCPage = pageNumber;
-        updateDLCPagination();
-    });
-    pageItem.appendChild(pageLink);
-    ul.appendChild(pageItem);
-}
-
-function createPageButton(label, isDisabled, onClick, ul) {
-    const item = document.createElement('li');
-    item.className = `page-item ${isDisabled ? 'disabled' : ''}`;
-    const button = document.createElement('a');
-    button.className = 'page-link';
-    button.href = '#';
-    button.textContent = label;
-    button.setAttribute('tabindex', '-1');
-    button.setAttribute('aria-disabled', isDisabled);
-    button.addEventListener('click', (event) => {
-        event.preventDefault();
-        if (!isDisabled) {
+// Cria um item de botão de paginação
+function createPaginationButton(text, isDisabledOrActive, onClick) {
+    const li = document.createElement('li');
+    li.className = `page-item ${isDisabledOrActive ? (typeof text === 'number' ? 'active' : 'disabled') : ''}`;
+    const a = document.createElement('a');
+    a.className = 'page-link';
+    a.href = '#';
+    a.textContent = text;
+    if (!isDisabledOrActive) {
+        a.addEventListener('click', (event) => {
+            event.preventDefault();
             onClick();
-        }
-    });
-    item.appendChild(button);
-    ul.appendChild(item);
+        });
+    }
+    li.appendChild(a);
+    return li;
 }
 
+// Atualiza a exibição de DLCs e a paginação
 function updateDLCPagination() {
     createDLCPagination();
     displayDLCs();
 }
 
-// Chama loadDLCs apenas na página de DLCs
-if (window.location.pathname.endsWith('dlcs.html')) {
-    loadDLCs();
-}
+// Chama a função de carregar DLCs quando a página for carregada
+document.addEventListener('DOMContentLoaded', loadDLCs);

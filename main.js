@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, Tray, nativeImage, dialog, shell, Menu, nativeTheme } = require('electron');
+const { app, BrowserWindow, ipcMain, session, Tray, nativeImage, shell, Menu, nativeTheme } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const log = require('electron-log');
 const path = require('path');
@@ -19,17 +19,22 @@ function createWindow() {
         height: 800,
         icon: path.join(__dirname, 'build/icon.png'),
         webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: true,  // Mantém a segurança ativa
-            enableRemoteModule: false // Desabilita o remote (obsoleto)
+            preload: path.join(__dirname, 'preload.js'),
+            contextIsolation: true,
+            enableRemoteModule: false,
+            nodeIntegration: false,
+            sandbox: true
         }
     });
 
     mainWindow.maximize();
-    new AppMenu(mainWindow);  // Cria o menu
+    mainWindow.setResizable(false);
+    mainWindow.setMaximizable(false);
+    mainWindow.setMinimizable(false);
+    new AppMenu(mainWindow);
     mainWindow.loadFile(path.join(__dirname, 'frontend', 'login.html'));
 
-    //Load Right click menu
+    // Load Right click menu
     mainWindow.webContents.on('context-menu', e => {
         rightMenu.popup(mainWindow);
     });
@@ -52,26 +57,17 @@ function createWindow() {
 // Função para criar o Tray
 function createTray() {
     try {
-        // Define o caminho do ícone com base no ambiente
         const iconPath = process.env.NODE_ENV === 'development' 
             ? path.join(__dirname, 'build/icon.png') 
             : path.join(process.resourcesPath, 'build/icon.png');
 
-        // Verifica se o ícone existe no caminho primário
         if (!fs.existsSync(iconPath)) {
-            console.warn(`Icon not found at path: ${iconPath}, trying fallback path...`);
-            // Define um caminho alternativo
             const fallbackIconPath = path.join(__dirname, 'build', 'icon.png');
-            
-            // Verifica se o ícone de fallback existe
             if (!fs.existsSync(fallbackIconPath)) {
-                throw new Error(`Neither primary nor fallback icons found. Primary: ${iconPath}, Fallback: ${fallbackIconPath}`);
+                throw new Error(`Neither primary nor fallback icons found.`);
             }
-
-            // Se o ícone principal não foi encontrado, use o de fallback
             tray = new Tray(fallbackIconPath);
         } else {
-            // Se o ícone principal foi encontrado
             tray = new Tray(iconPath);
         }
 
@@ -81,18 +77,8 @@ function createTray() {
             {
                 label: 'Redes Sociais',
                 submenu: [
-                    {
-                        label: 'YouTube',
-                        click: () => {
-                            shell.openExternal('https://www.youtube.com/@renildomarcio');
-                        }
-                    },
-                    {
-                        label: 'GitHub',
-                        click: () => {
-                            shell.openExternal('https://github.com/psycodeliccircus');
-                        }
-                    }
+                    { label: 'YouTube', click: () => shell.openExternal('https://www.youtube.com/@renildomarcio') },
+                    { label: 'GitHub', click: () => shell.openExternal('https://github.com/psycodeliccircus') }
                 ]
             },
             { type: 'separator' },
@@ -111,7 +97,7 @@ function createTray() {
     }
 }
 
-// Manipuladores de atualização
+// Funções relacionadas a atualização
 function handleUpdateChecking() {
     log.log('Checking for updates.');
 }
@@ -131,7 +117,7 @@ function handleDownloadProgress(progressObj) {
     const transferredFormatted = formatBytes(progressObj.transferred);
     const totalFormatted = formatBytes(progressObj.total);
     const speedFormatted = formatBytes(progressObj.bytesPerSecond);
-    
+
     const message = `Downloading update. Speed: ${speedFormatted}/s - ${~~progressObj.percent}% [${transferredFormatted}/${totalFormatted}]`;
     log.log(message);
 
@@ -172,22 +158,71 @@ autoUpdater.on('error', handleUpdateError);
 autoUpdater.on('update-not-available', handleUpdateNotAvailable);
 autoUpdater.on('update-downloaded', handleUpdateDownloaded);
 
-// Evento que é chamado quando o aplicativo está pronto
+// Evento quando o aplicativo está pronto
 app.whenReady().then(() => {
     createWindow();
-    createTray(); // Chama a função para criar o Tray
+    createTray();
 });
 
-// Encerrar o aplicativo quando todas as janelas forem fechadas, exceto no macOS
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
         app.quit();
     }
 });
 
-// Recria a janela no macOS quando o ícone do dock é clicado e não há outras janelas abertas
 app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
         createWindow();
     }
+});
+
+// Evento de download
+ipcMain.on('download-dlc', (event, downloadUrl) => {
+    const win = BrowserWindow.getFocusedWindow();
+    const downloadDir = app.getPath('downloads');
+    
+    win.webContents.downloadURL(downloadUrl);
+
+    win.webContents.session.on('will-download', (event, item) => {
+        const filePath = path.join(downloadDir, item.getFilename());
+
+        if (fs.existsSync(filePath)) {
+            try {
+                fs.unlinkSync(filePath);
+                console.log(`Arquivo existente deletado: ${filePath}`);
+            } catch (error) {
+                console.error(`Erro ao deletar arquivo existente: ${error.message}`);
+            }
+        }
+
+        item.setSavePath(filePath);
+
+        item.on('updated', (event, state) => {
+            if (state === 'progressing') {
+                const progress = Math.round((item.getReceivedBytes() / item.getTotalBytes()) * 100);
+                win.webContents.send('download-progress', { percent: progress });
+            }
+        });
+
+        item.on('done', (event, state) => {
+            if (state === 'completed') {
+                const swalMessage = `Swal.fire({
+                    title: 'Download Completo',
+                    html: 'O arquivo foi baixado com sucesso!<br> Na pasta <b>Downloads</b> com nome: ${item.getFilename()}',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });`;
+                mainWindow.webContents.executeJavaScript(swalMessage);
+                win.webContents.send('download-complete');
+            } else {
+                const swalError = `Swal.fire({
+                    title: 'Erro no Download',
+                    text: 'O download falhou.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });`;
+                mainWindow.webContents.executeJavaScript(swalError);
+            }
+        });
+    });
 });

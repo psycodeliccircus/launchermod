@@ -1,6 +1,4 @@
-const { app, Menu } = require('electron');
-const path = require('path');
-const { shell } = require('electron');
+const { app, Menu, shell } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const log = require('electron-log');
 
@@ -13,48 +11,66 @@ class AppMenu {
     createMenu() {
         const menuTemplate = [
             {
-                label: 'Launcher Mods v' + app.getVersion(),
+                label: `Launcher Mods v${app.getVersion()}`,
                 submenu: [
-                    {
-                        label: 'Verificar Atualizações', // Novo botão para verificar atualizações
-                        click: () => {
-                            autoUpdater.checkForUpdates(); // Chama o método para verificar atualizações manualmente
-                            log.log('Apertou no autoUpdater.');
-                        }
-                    },
-                    {
-                        label: 'Sair',
-                            click: () => {
-                            app.quit();
-                            log.log('Apertou no sair.');
-                        }
-                    },
-                    { type: 'separator' }, // Separador
-                    {
-                        label: 'Redes Sociais',
-                        submenu: [
-                            {
-                                label: 'YouTube',
-                                click: () => {
-                                    shell.openExternal('https://www.youtube.com/@renildomarcio'); // Substitua pela sua URL
-                                    log.log('Apertou no youtube.');
-                                }
-                            },
-                            {
-                                label: 'GitHub',
-                                click: () => {
-                                    shell.openExternal('https://github.com/psycodeliccircus'); // Substitua pela sua URL
-                                    log.log('Apertou no github.');
-                                }
-                            }
-                        ]
-                    }
+                    this.createUpdateMenuItem(),
+                    this.createExitMenuItem(),
+                    { type: 'separator' },
+                    this.createSocialMediaSubmenu()
                 ]
             }
         ];
 
         const menu = Menu.buildFromTemplate(menuTemplate);
         Menu.setApplicationMenu(menu);
+    }
+
+    createUpdateMenuItem() {
+        return {
+            label: 'Verificar Atualizações',
+            click: () => {
+                this.checkForUpdates();
+            }
+        };
+    }
+
+    createExitMenuItem() {
+        return {
+            label: 'Sair',
+            click: () => {
+                app.quit();
+                this.logAction('Apertou no sair.');
+            }
+        };
+    }
+
+    createSocialMediaSubmenu() {
+        return {
+            label: 'Redes Sociais',
+            submenu: [
+                this.createSocialMediaItem('YouTube', 'https://www.youtube.com/@renildomarcio'),
+                this.createSocialMediaItem('GitHub', 'https://github.com/psycodeliccircus')
+            ]
+        };
+    }
+
+    createSocialMediaItem(label, url) {
+        return {
+            label,
+            click: () => {
+                shell.openExternal(url);
+                this.logAction(`Apertou no ${label.toLowerCase()}.`);
+            }
+        };
+    }
+
+    checkForUpdates() {
+        autoUpdater.checkForUpdates();
+        this.logAction('Apertou no autoUpdater.');
+    }
+
+    logAction(message) {
+        log.log(message);
     }
 }
 

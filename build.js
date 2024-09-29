@@ -12,9 +12,10 @@ class Index {
                 generateUpdatesFilesForAllChannels: false,
                 appId: 'com.github.psycodeliccircus.launchermod',
                 productName: 'launchermod',
+                executableName: "launchermod",
                 icon: "./build/icon.ico",
                 copyright: "Copyright © 1984-2024 Launcher Mods - Dev by RenildoMarcio",
-                artifactName: "${productName}-${os}-${arch}.${ext}",
+                //artifactName: "${productName}-${os}-${arch}.${ext}",
                 files: ["**/*", "package.json", "LICENSE.md"],
                 directories: { "output": "dist" },
                 compression: 'maximum',
@@ -25,12 +26,15 @@ class Index {
                 }],
                 win: {
                     icon: "./build/icon.ico",
-                    target: [{
+                    target: [
+                        {
                         target: "nsis",
                         arch: ["x64"]
-                    }],
+                        }
+                    ],
                 },
                 nsis: {
+                    artifactName: "${productName}-${os}-${arch}.exe",
                     installerIcon: "./build/icon.ico",
                     uninstallerIcon: "./build/uninstall.ico",
                     oneClick: false,
@@ -52,6 +56,10 @@ class Index {
                     entitlements: "build/entitlements.plist",
                     entitlementsInherit: "build/entitlementsInherit.plist"
                 },
+                dmg: {
+                    artifactName: "${productName}-${os}-${arch}.dmg",
+                    title: "Launcher Mods Installer"
+                },
                 linux: {
                     icon: "./build/icon.png",
                     target: [{
@@ -62,13 +70,26 @@ class Index {
                         arch: ["x64"]
                     }]
                 },
+                appImage: {
+                    artifactName: "${productName}-${os}-${arch}.AppImage",
+                    category: "Game",
+                    desktop: "./LauncherMod.desktop",
+                    license: "./eula.txt"
+                },
                 // Aqui é onde você adiciona o extraResources
                 extraResources: [
                     {
                         from: "build/icon.png", // Caminho da sua pasta de ícones ou qualquer outro arquivo
                         to: "build/icon.png" // O destino no diretório final
                     }
-                ]
+                ],
+                protocols: {
+                    name: "launchermod",
+                    schemes: [
+                        "launchermods",
+                        "launchermod"
+                    ]
+                }
             }
         }).then(() => {
             console.log('A build está concluída')
