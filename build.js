@@ -64,10 +64,10 @@ class Index {
                     icon: "./build/icon.png",
                     target: [{
                         target: "AppImage",
-                        arch: ["x64", "arm64", "armv7l"]
+                        arch: ["x64", "arm64"]
                     }, {
                         target: "tar.gz",
-                        arch: ["x64", "arm64", "armv7l"]
+                        arch: ["x64", "arm64"]
                     }]
                 },
                 appImage: {
