@@ -29,7 +29,7 @@ class Index {
                     target: [
                         {
                         target: "nsis",
-                        arch: ["x64", "x32"]
+                        arch: ["x64", "ia32"]
                         }
                     ],
                 },
