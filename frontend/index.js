@@ -45,3 +45,12 @@ toggler.addEventListener('change', function () {
 document.getElementById('logoutBtn')?.addEventListener('click', () => {
     window.location.href = 'login.html';
 });
+
+function applyTranslations() {
+    document.querySelectorAll('.translate').forEach(element => {
+        const key = element.getAttribute('data-key');
+        if (translations[currentLanguage][key]) {
+            element.textContent = translations[currentLanguage][key];
+        }
+    });
+}

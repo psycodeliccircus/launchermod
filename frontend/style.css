@@ -209,11 +209,43 @@ body{
 
 .content nav a{
     color: var(--dark);
+    background-color: var(--light);
+}
+
+.page-item.disabled .page-link {
+    color: var(--dark);
+    pointer-events: none;
+    cursor: auto;
+    background-color: var(--light);
+    /* border-color: #dee2e6; */
+}
+
+/* Estiliza a barra de rolagem em elementos com overflow */
+::-webkit-scrollbar {
+    width: 15px; /* Largura da barra de rolagem */
+}
+
+/* Estiliza a parte de fundo da barra de rolagem */
+::-webkit-scrollbar-track {
+    background: var(--light); /* Cor de fundo */
+    border-radius: 20px; /* Arredondar bordas */
+}
+
+/* Estiliza o polegar da barra de rolagem */
+::-webkit-scrollbar-thumb {
+    background-color: var(--light); /* Cor do polegar */
+    border-radius: 20px; /* Arredondar o polegar */
+    border: 3px solid var(--light); /* Cor de borda para o polegar */
+}
+
+/* Estiliza o polegar da barra de rolagem quando o usuário está interagindo com ele */
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--light); /* Cor ao passar o mouse */
 }
 
 .content nav .bx.bx-menu{
     cursor: pointer;
-    color: var(--dark);
+    color: var(--light);
 }
 
 .content nav form{
@@ -712,3 +744,27 @@ a:hover {
     background-color: var(--light);
     border-radius: .25rem;
 }
+
+/* Estilos para o seletor de idiomas */
+#language-selector {
+    background-color: var(--light); /* Cor de fundo */
+    border: 1px solid var(--light); /* Borda */
+    border-radius: 5px; /* Bordas arredondadas */
+    padding: 8px 12px; /* Espaçamento interno */
+    font-size: 18px; /* Tamanho da fonte */
+    color: var(--dark); /* Cor do texto */
+    cursor: pointer; /* Cursor de mão ao passar o mouse */
+    transition: border-color 0.3s, box-shadow 0.3s; /* Transições suaves */
+}
+
+/* Estilo ao passar o mouse */
+#language-selector:hover {
+    border-color: var(--light); /* Cor da borda ao passar o mouse */
+}
+
+/* Estilo ao focar no seletor */
+#language-selector:focus {
+    outline: none; /* Remove o contorno padrão */
+    border-color: var(--light); /* Cor da borda ao focar */
+}
+

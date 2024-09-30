@@ -7,6 +7,7 @@ const gameImages = {
     'ETS2': 'https://chevereto.renildomarcio.com.br/images/2024/09/28/6126a8c3005e0305691e1612c2687063.png',
     'ats': 'https://chevereto.renildomarcio.com.br/images/2024/09/28/c542f9de6ff5f021f1946ddbe8c39c97.md.png',
     'gta5': 'https://chevereto.renildomarcio.com.br/images/2024/09/28/16eac7ff051e1f71d8d1f3d8c1b8de7f.md.png',
+    'FiveM': 'https://chevereto.renildomarcio.com.br/images/2024/09/29/0d9e69bf39b71a6f2792b7ed1fbb8d18.md.png',
     // Adicione mais jogos e caminhos de imagem conforme necessário
 };
 
@@ -21,7 +22,7 @@ async function loadMods() {
             createPagination();
         }
     } catch (error) {
-        displayErrorMessage('Erro ao carregar os mods. Tente novamente mais tarde.');
+        displayErrorMessage(translations[currentLanguage].errorLoadingMods);
     }
 }
 
@@ -35,7 +36,7 @@ function displayMods() {
     const paginatedMods = mods.slice(start, end);
 
     if (paginatedMods.length === 0) {
-        displayErrorMessage('Nenhum mod disponível no momento.');
+        displayErrorMessage(translations[currentLanguage].noMods);
         return;
     }
 
@@ -47,14 +48,14 @@ function displayMods() {
 
         row.innerHTML = `
             <td>
-                <img src="${gameImage}" alt="${mod.game}" style="width: 50px; height: auto;">
+                <img src="${gameImage}" alt="${mod.name}" style="width: 50px; height: auto;" class="img-tooltip" data-toggle="tooltip" data-placement="top" title="${mod.name}">
             </td>
-            <td>${mod.game}</td>
+            <!-- <td>${mod.game}</td> -->
             <td>${mod.name}</td>
             <td>
                 <a href="#" class="report download-link">
                     <i class="bx bx-cloud-download"></i>
-                    <span>Download</span>
+                    <span>${translations[currentLanguage].download}</span>
                 </a>
                 <div class="progress mt-2" style="display: none;">
                     <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
@@ -101,7 +102,7 @@ function startDownload(downloadLink, linkElement, progressBarContainer, progress
     window.electronAPI.onDownloadComplete(() => {
         progressBar.className = 'progress-bar progress-bar-striped bg-success';
         progressBar.style.width = '100%'; 
-        progressBar.textContent = 'Download Completo!'; 
+        progressBar.textContent = translations[currentLanguage].downloadComplete; 
 
         // Oculta a barra após 5 segundos
         setTimeout(() => {

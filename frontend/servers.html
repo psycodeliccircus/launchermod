@@ -1,38 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt"> <!-- Mudado para 'pt' para o idioma padrão -->
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
     <link rel="stylesheet" href="style.css">
-    <title>Launcher Mods - Servidores de Jogos</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>Launcher Mods - Servidores</title>
 </head>
 
 <body>
-  <!-- Sidebar -->
-  <div class="sidebar">
-      <a href="mods.html" class="logo">
-          <i class='bx bx-code-alt'></i>
-          <div class="logo-name"><span>Launcher</span>Mod</div>
-      </a>
-      <ul class="side-menu">
-          <li><a href="mods.html"><i class='bx bx-cloud-download'></i>Mods</a></li>
-          <li><a href="dlcs.html"><i class='bx bx-cloud-download'></i>DLCs</a></li>
-          <li class="active"><a href="servers.html"><i class='bx bx-server'></i>Servidores</a></li>
-          <li><a href="contact.html"><i class='bx bx-mail-send'></i>Contato</a></li>
-      </ul>
-      <ul class="side-menu">
-        <li>
-            <a href="login.html" id="logoutBtn" class="logout">
-                <i class='bx bx-chevron-right-square'></i>
-                Sair
-            </a>
-        </li>
-    </ul>
-  </div>
-  <!-- End of Sidebar -->
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="mods.html" class="logo">
+            <i class='bx bx-code-alt'></i>
+            <div class="logo-name"><span>Launcher</span>Mod</div>
+        </a>
+        <ul class="side-menu">
+            <li><a href="mods.html"><i class='bx bx-cloud-download'></i><span class="translate" data-key="mods">Mods</span></a></li>
+            <li><a href="dlcs.html"><i class='bx bx-cloud-download'></i><span class="translate" data-key="dlcs">DLCs</span></a></li>
+            <li class="active"><a href="servers.html"><i class='bx bx-server'></i><span class="translate" data-key="servers">Servidores</span></a></li>
+        </ul>
+        <ul class="side-menu">
+            <li>
+                <a href="login.html" id="logoutBtn" class="logout">
+                    <i class='bx bx-chevron-right-square'></i>
+                    <span class="translate" data-key="logout">Sair</span>
+                </a>
+            </li>
+        </ul>
+        <div id="audioContainer">
+            <audio id="audioPlayer" controls autoplay>
+              <source src="https://stream.zeno.fm/wdzntbh2hfwtv" type="audio/mpeg">
+              Seu navegador não suporta o elemento de áudio.
+            </audio>
+          </div>
+          
+          <style>
+            /* Estilos para a div que contém o player */
+            #audioContainer {
+              width: 220px; /* Defina a largura da div */
+              padding: 10px;
+              background-color: #f0f0f0; /* Cor de fundo da div */
+              border: 2px solid #ccc; /* Borda ao redor da div */
+              border-radius: 8px; /* Borda arredondada */
+              text-align: center; /* Centraliza o player de áudio */
+              margin: 20px auto; /* Margem automática para centralizar horizontalmente */
+            }
+          
+            /* Define a largura e altura personalizadas do player de áudio */
+            #audioPlayer {
+              width: 100%; /* Player ajusta-se à largura da div */
+              height: 10px; /* Altura personalizada do player */
+            }
+          </style>
+          
+          <script>
+            // Get the audio element
+            const audioPlayer = document.getElementById('audioPlayer');
+            // Set the volume to 5%
+            audioPlayer.volume = 0.05;
+          </script>
+                  
+    </div>
+    <!-- End of Sidebar -->
 
     <!-- Main Content -->
     <div class="content">
@@ -40,6 +73,11 @@
         <nav>
             <i class='bx bx-menu'></i>
             <form action="#"></form>
+            <!-- Seletor de Idiomas -->
+            <select id="language-selector" class="form-control" style="width: auto; display: inline-block;">
+              <option value="pt">Português</option>
+              <option value="en">English</option>
+            </select>
             <input type="checkbox" id="theme-toggle" hidden>
             <label for="theme-toggle" class="theme-toggle"></label>
         </nav>
@@ -48,7 +86,7 @@
         <main>
             <div class="header">
                 <div class="left">
-                    <h1>Servidores de Jogos</h1>
+                    <h1 class="translate" data-key="serversHeader">Servidores de Jogos</h1>
                 </div>
             </div>
 
@@ -56,13 +94,13 @@
                 <div class="orders">
                     <div class="header">
                         <i class='bx bx-server'></i>
-                        <h3>Lista de Servidores</h3>
+                        <h3 class="translate" data-key="serverListHeader">Lista de Servidores</h3>
                     </div>
                     <table id="serversTable">
                         <thead>
                             <tr>
-                                <th>Nome</th>
-                                <th>Link</th>
+                                <th class="translate" data-key="name">Nome</th>
+                                <th class="translate" data-key="link">Link</th>
                             </tr>
                         </thead>
                         <tbody id="serversList">
@@ -76,35 +114,92 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Seleciona o elemento da tabela
-            const serverList = document.getElementById('serversList');
-    
+        // Objeto de traduções
+        const translations = {
+            en: {
+                serversHeader: 'Game Servers',
+                serverListHeader: 'Server List',
+                name: 'Name',
+                link: 'Link',
+                noServers: 'No servers available at the moment.',
+                errorLoading: 'Error loading servers. Please try again later.',
+                mods: 'Mods',
+                dlcs: 'DLCs',
+                servers: 'Servers',
+                logout: 'Logout'
+            },
+            pt: {
+                serversHeader: 'Servidores de Jogos',
+                serverListHeader: 'Lista de Servidores',
+                name: 'Nome',
+                link: 'Link',
+                noServers: 'Nenhum servidor disponível no momento.',
+                errorLoading: 'Erro ao carregar os servidores. Tente novamente mais tarde.',
+                mods: 'Mods',
+                dlcs: 'DLCs',
+                servers: 'Servidores',
+                logout: 'Sair'
+            }
+        };
+
+        // Tenta recuperar o idioma salvo do localStorage ou usa 'pt' como padrão
+        let currentLanguage = localStorage.getItem('language') || 'pt';
+
+        // Função para aplicar traduções
+        function applyTranslations() {
+            document.querySelectorAll('.translate').forEach(element => {
+                const key = element.getAttribute('data-key');
+                element.textContent = translations[currentLanguage][key];
+            });
+        }
+
+        // Função para mudar o idioma
+        function changeLanguage() {
+            const selector = document.getElementById('language-selector');
+            currentLanguage = selector.value; // Define o idioma atual baseado na seleção
+            localStorage.setItem('language', currentLanguage); // Salva a seleção do idioma
+            applyTranslations(); // Aplica as traduções
+        }
+
+        document.getElementById('language-selector').addEventListener('change', (event) => {
+            const selectedLanguage = event.target.value;
+            // Envia o idioma selecionado para o main process
+            window.electronAPI.setLanguage(selectedLanguage);
+        });
+
+        // Define o valor do seletor de idiomas com o idioma salvo
+        document.addEventListener('DOMContentLoaded', () => {
+            const selector = document.getElementById('language-selector');
+            selector.value = currentLanguage; // Define o valor do seletor
+            applyTranslations(); // Aplica as traduções ao carregar a página
+
             // Fetch para obter a lista de servidores
             fetch('https://api.renildomarcio.com.br/backend/servers.php')
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('Erro na resposta do servidor: ' + response.statusText);
+                        throw new Error(translations[currentLanguage].errorLoading);
                     }
                     return response.json();
                 })
                 .then(servers => {
+                    const serverList = document.getElementById('serversList');
+
                     // Verifica se há servidores retornados
                     if (servers.length === 0) {
                         const emptyMessage = document.createElement('tr');
-                        emptyMessage.innerHTML = '<td colspan="2">Nenhum servidor disponível no momento.</td>';
+                        emptyMessage.innerHTML = `<td colspan="2" class="text-center text-danger">${translations[currentLanguage].noServers}</td>`;
                         serverList.appendChild(emptyMessage);
                         return;
                     }
-    
+
                     // Itera sobre os servidores e adiciona à tabela
                     servers.forEach(server => {
                         const row = document.createElement('tr');
-    
+
                         // Cria células da tabela de forma mais segura
                         const nameCell = document.createElement('td');
                         nameCell.textContent = server.name;
-    
+
                         const linkCell = document.createElement('td');
                         const link = document.createElement('a');
                         link.href = server.link;
@@ -112,11 +207,11 @@
                         link.textContent = 'Entrar';
                         link.setAttribute('aria-label', `Entrar no servidor ${server.name}`);
                         linkCell.appendChild(link);
-    
+
                         // Adiciona as células à linha
                         row.appendChild(nameCell);
                         row.appendChild(linkCell);
-    
+
                         // Adiciona a linha à tabela
                         serverList.appendChild(row);
                     });
@@ -125,16 +220,19 @@
                     console.error('Erro ao carregar os servidores:', error);
                     // Exibe uma mensagem para o usuário em caso de erro
                     const errorMessage = document.createElement('tr');
-                    errorMessage.innerHTML = '<td colspan="2">Erro ao carregar os servidores. Tente novamente mais tarde.</td>';
+                    errorMessage.innerHTML = `<td colspan="2">${translations[currentLanguage].errorLoading}</td>`;
                     serverList.appendChild(errorMessage);
                 });
         });
+
+        // Evento para mudar o idioma quando o usuário selecionar uma opção
+        document.getElementById('language-selector').addEventListener('change', changeLanguage);
     </script>
- 
+
     <script src="index.js"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s" crossorigin="anonymous"></script>
 </body>
 
 </html>

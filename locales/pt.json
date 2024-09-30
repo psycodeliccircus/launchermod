@@ -1,0 +1,10 @@
+{
+   "downloadComplete": "Download Completo",
+   "downloadSuccessMessage": "O arquivo foi baixado com sucesso!<br> Na pasta <b>Downloads</b> com nome: {{fileName}}",
+   "downloadError": "Erro no Download",
+   "downloadFailedMessage": "O download falhou.",
+   "downloadingUpdate": "Baixando atualização",
+   "restartingApp": "Aguente firme, reiniciando o aplicativo para atualização!",
+   "updateError": "Erro ao verificar atualizações"
+}
+  

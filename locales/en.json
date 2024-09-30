@@ -1,0 +1,10 @@
+{
+    "downloadComplete": "Download Complete",
+    "downloadSuccessMessage": "The file was successfully downloaded!<br> In <b>Downloads</b> folder with name: {{fileName}}",
+    "downloadError": "Download Error",
+    "downloadFailedMessage": "The download failed.",
+    "downloadingUpdate": "Downloading update",
+    "restartingApp": "Hold tight, restarting the app to update!",
+    "updateError": "Error checking for updates"
+  }
+  

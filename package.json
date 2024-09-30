@@ -1,12 +1,12 @@
 {
     "name": "launchermods",
-    "version": "1.1.8",
+    "version": "1.1.9",
     "description": "Sistema Launcher Mods",
     "main": "main.js",
     "scripts": {
         "start": "electron .",
         "build": "node build.js --build",
-        "icon": "node build.js --icon=https://downloadr2.apkmirror.com/wp-content/uploads/2022/03/Pixel-Launcher-Mods_round.png"
+        "icon": "node build.js --icon=https://raw.githubusercontent.com/psycodeliccircus/launchermod/refs/heads/main/build/icon.png"
     },
     "keywords": [
         "electron",

@@ -8,7 +8,7 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <title>Launcher Mods - Cadastro</title>
+    <title class="translate" data-key="launcherRegistration">Launcher Mods - Cadastro</title>
 </head>
 
 <body>
@@ -20,8 +20,8 @@
           <div class="logo-name"><span>Launcher</span>Mod</div>
       </a>
       <ul class="side-menu">
-          <li><a href="login.html"><i class='bx bx-log-in'></i>Login</a></li>
-          <li class="active"><a href="register.html"><i class='bx bx-send'></i>Cadastro</a></li>
+          <li><a href="login.html"><i class='bx bx-log-in'></i><span class="translate" data-key="login">Login</span></a></li>
+          <li class="active"><a href="register.html"><i class='bx bx-send'></i><span class="translate" data-key="register">Cadastro</span></a></li>
       </ul>
   </div>
   <!-- End of Sidebar -->
@@ -31,12 +31,14 @@
         <!-- Navbar -->
         <nav>
             <i class='bx bx-menu'></i>
-            <form action="#">
-
-            </form>
+            <form action="#"></form>
             <input type="checkbox" id="theme-toggle" hidden>
             <label for="theme-toggle" class="theme-toggle"></label>
-
+            <!-- Seletor de idioma -->
+            <select id="language-selector" class="ml-2">
+                <option value="pt">Português</option>
+                <option value="en">English</option>
+            </select>
         </nav>
 
         <!-- End of Navbar -->
@@ -44,16 +46,15 @@
         <main>
             <div class="header">
                 <div class="left">
-                    <h1>Launcher Mods Cadastro</h1>
+                    <h1 class="translate" data-key="launcherRegistration">Launcher Mods Cadastro</h1>
                 </div>
-
             </div>
 
             <div class="bottom-data">
                 <div class="orders">
                     <div class="header">
                         <i class='bx bx-send'></i>
-                        <h3>Cadastro</h3>
+                        <h3 class="translate" data-key="registerHeader">Cadastro</h3>
                     </div>
                     <form>
                         <div class="form-group">
@@ -62,9 +63,9 @@
                         <div class="form-group">
                             <input type="password" id="regPassword" class="form-control" placeholder="Senha" required>
                         </div>
-                        <button type="button" id="registerBtn" class="btn btn-primary btn-block">Cadastrar</button>
+                        <button type="button" id="registerBtn" class="btn btn-primary btn-block translate" data-key="registerButton">Cadastrar</button>
                     </form>
-                    <p class="mt-3 text-center">Já tem uma conta? <a href="login.html">Faça login aqui</a></p>
+                    <p class="mt-3 text-center translate" data-key="haveAccount">Já tem uma conta? <a href="login.html" class="translate" data-key="loginHere">Faça login aqui</a></p>
                     <script src="register.js"></script>
                 </div>
             </div>
@@ -78,6 +79,65 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+    <script>
+        // Objeto de traduções
+        const translations = {
+            en: {
+                launcherRegistration: 'Launcher Mods - Registration',
+                login: 'Login',
+                register: 'Register',
+                registerHeader: 'Registration',
+                registerButton: 'Register',
+                haveAccount: 'Already have an account?',
+                loginHere: 'Login here'
+            },
+            pt: {
+                launcherRegistration: 'Launcher Mods - Cadastro',
+                login: 'Login',
+                register: 'Cadastro',
+                registerHeader: 'Cadastro',
+                registerButton: 'Cadastrar',
+                haveAccount: 'Já tem uma conta?',
+                loginHere: 'Faça login aqui'
+            }
+        };
+
+        // Tenta recuperar o idioma salvo do localStorage ou usa 'pt' como padrão
+        let currentLanguage = localStorage.getItem('language') || 'pt';
+
+        // Função para aplicar traduções
+        function applyTranslations() {
+            document.querySelectorAll('.translate').forEach(element => {
+                const key = element.getAttribute('data-key');
+                if (translations[currentLanguage][key]) {
+                    element.textContent = translations[currentLanguage][key]; // Atualiza o texto
+                }
+            });
+        }
+
+        // Função para mudar o idioma
+        function changeLanguage() {
+            const selector = document.getElementById('language-selector');
+            currentLanguage = selector.value; // Define o idioma atual baseado na seleção
+            localStorage.setItem('language', currentLanguage); // Salva a seleção do idioma
+            applyTranslations(); // Aplica as traduções
+        }
+        document.getElementById('language-selector').addEventListener('change', (event) => {
+            const selectedLanguage = event.target.value;
+            // Envia o idioma selecionado para o main process
+            window.electronAPI.setLanguage(selectedLanguage);
+        });
+
+        // Define o valor do seletor de idiomas com o idioma salvo
+        document.addEventListener('DOMContentLoaded', () => {
+            const selector = document.getElementById('language-selector');
+            selector.value = currentLanguage; // Define o valor do seletor
+            applyTranslations(); // Aplica as traduções ao carregar a página
+        });
+
+        // Evento para mudar o idioma quando o usuário selecionar uma opção
+        document.getElementById('language-selector').addEventListener('change', changeLanguage);
+    </script>
 </body>
 
 </html>

@@ -12,6 +12,20 @@ let mainWindow; // Variável para armazenar a janela principal
 let tray = null; // Variável para armazenar o Tray
 let rightMenu = Menu.buildFromTemplate(RightMenuapp);
 
+// Função para carregar as traduções
+function loadTranslations(language) {
+    const filePath = path.join(__dirname, `locales/${language}.json`);
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+}
+
+const currentLanguage = 'pt'; // Mude para 'en' se preferir inglês
+const translations = loadTranslations(currentLanguage);
+
+ipcMain.on('set-language', (event, language) => {
+    const translations = loadTranslations(language);
+    mainWindow.webContents.send('language-updated', translations);
+});
+
 // Função para criar a janela principal
 function createWindow() {
     mainWindow = new BrowserWindow({
@@ -31,6 +45,7 @@ function createWindow() {
     mainWindow.setResizable(false);
     mainWindow.setMaximizable(false);
     mainWindow.setMinimizable(false);
+    //mainWindow.webContents.openDevTools();
     new AppMenu(mainWindow);
     mainWindow.loadFile(path.join(__dirname, 'frontend', 'login.html'));
 
@@ -118,11 +133,11 @@ function handleDownloadProgress(progressObj) {
     const totalFormatted = formatBytes(progressObj.total);
     const speedFormatted = formatBytes(progressObj.bytesPerSecond);
 
-    const message = `Downloading update. Speed: ${speedFormatted}/s - ${~~progressObj.percent}% [${transferredFormatted}/${totalFormatted}]`;
+    const message = `${translations.downloadingUpdate}. Speed: ${speedFormatted}/s - ${~~progressObj.percent}% [${transferredFormatted}/${totalFormatted}]`;
     log.log(message);
 
     const swalMessage = `Swal.fire({
-        title: 'Baixando atualização',
+        title: '${translations.downloadingUpdate}',
         html: '${message}',
         allowOutsideClick: false,
         onBeforeOpen: () => Swal.showLoading()
@@ -132,7 +147,7 @@ function handleDownloadProgress(progressObj) {
 }
 
 function handleUpdateError(err) {
-    log.log(`Update check failed: ${err.toString()}`);
+    log.log(`Update check failed: ${translations.updateError}`);
 }
 
 function handleUpdateNotAvailable(info) {
@@ -141,8 +156,8 @@ function handleUpdateNotAvailable(info) {
 
 function handleUpdateDownloaded(info) {
     const swalMessage = `Swal.fire({
-        title: 'Reiniciando o aplicativo',
-        html: 'Aguente firme, reiniciando o aplicativo para atualização!',
+        title: '${translations.restartingApp}',
+        html: '${translations.restartingApp}',
         allowOutsideClick: false,
         onBeforeOpen: () => Swal.showLoading()
     });`;
@@ -156,7 +171,7 @@ autoUpdater.on('update-available', handleUpdateAvailable);
 autoUpdater.on('download-progress', handleDownloadProgress);
 autoUpdater.on('error', handleUpdateError);
 autoUpdater.on('update-not-available', handleUpdateNotAvailable);
-autoUpdater.on('update-downloaded', handleUpdateDownloaded);
+autoUpdater.on('update-detected', handleUpdateDownloaded);
 
 // Evento quando o aplicativo está pronto
 app.whenReady().then(() => {
@@ -207,8 +222,8 @@ ipcMain.on('download-dlc', (event, downloadUrl) => {
         item.on('done', (event, state) => {
             if (state === 'completed') {
                 const swalMessage = `Swal.fire({
-                    title: 'Download Completo',
-                    html: 'O arquivo foi baixado com sucesso!<br> Na pasta <b>Downloads</b> com nome: ${item.getFilename()}',
+                    title: '${translations.downloadComplete}',
+                    html: '${translations.downloadSuccessMessage.replace('{{fileName}}', item.getFilename())}',
                     icon: 'success',
                     confirmButtonText: 'OK'
                 });`;
@@ -216,8 +231,8 @@ ipcMain.on('download-dlc', (event, downloadUrl) => {
                 win.webContents.send('download-complete');
             } else {
                 const swalError = `Swal.fire({
-                    title: 'Erro no Download',
-                    text: 'O download falhou.',
+                    title: '${translations.downloadError}',
+                    text: '${translations.downloadFailedMessage}',
                     icon: 'error',
                     confirmButtonText: 'OK'
                 });`;

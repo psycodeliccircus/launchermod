@@ -1,18 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt"> <!-- Mudado para 'pt' para o idioma padrão -->
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>Launcher Mods - Mods</title>
 </head>
 
 <body>
-
   <!-- Sidebar -->
   <div class="sidebar">
       <a href="mods.html" class="logo">
@@ -20,79 +19,181 @@
           <div class="logo-name"><span>Launcher</span>Mod</div>
       </a>
       <ul class="side-menu">
-          <li class="active"><a href="mods.html"><i class='bx bx-cloud-download'></i>Mods</a></li>
-          <li><a href="dlcs.html"><i class='bx bx-cloud-download'></i>DLCs</a></li>
-          <li><a href="servers.html"><i class='bx bx-server'></i>Servidores</a></li>
-          <li><a href="contact.html"><i class='bx bx-mail-send'></i>Contato</a></li>
+          <li class="active"><a href="mods.html"><i class='bx bx-cloud-download'></i><span class="translate" data-key="mods">Mods</span></a></li>
+          <li><a href="dlcs.html"><i class='bx bx-cloud-download'></i><span class="translate" data-key="dlcs">DLCs</span></a></li>
+          <li><a href="servers.html"><i class='bx bx-server'></i><span class="translate" data-key="servers">Servidores</span></a></li>
       </ul>
       <ul class="side-menu">
         <li>
             <a href="login.html" id="logoutBtn" class="logout">
                 <i class='bx bx-chevron-right-square'></i>
-                Sair
+                <span class="translate" data-key="logout">Sair</span>
             </a>
         </li>
       </ul>
+      <div id="audioContainer">
+        <audio id="audioPlayer" controls autoplay>
+          <source src="https://stream.zeno.fm/wdzntbh2hfwtv" type="audio/mpeg">
+          Seu navegador não suporta o elemento de áudio.
+        </audio>
+      </div>
+      
+      <style>
+        /* Estilos para a div que contém o player */
+        #audioContainer {
+          width: 220px; /* Defina a largura da div */
+          padding: 10px;
+          background-color: #f0f0f0; /* Cor de fundo da div */
+          border: 2px solid #ccc; /* Borda ao redor da div */
+          border-radius: 8px; /* Borda arredondada */
+          text-align: center; /* Centraliza o player de áudio */
+          margin: 20px auto; /* Margem automática para centralizar horizontalmente */
+        }
+      
+        /* Define a largura e altura personalizadas do player de áudio */
+        #audioPlayer {
+          width: 100%; /* Player ajusta-se à largura da div */
+          height: 10px; /* Altura personalizada do player */
+        }
+      </style>
+      
+      <script>
+        // Get the audio element
+        const audioPlayer = document.getElementById('audioPlayer');
+        // Set the volume to 5%
+        audioPlayer.volume = 0.05;
+      </script>
+                
   </div>
   <!-- End of Sidebar -->
 
-    <!-- Main Content -->
-    <div class="content">
-        <!-- Navbar -->
-        <nav>
-            <i class='bx bx-menu'></i>
-            <form action="#">
+  <!-- Main Content -->
+  <div class="content">
+      <!-- Navbar -->
+      <nav>
+          <i class='bx bx-menu'></i>
+          <form action="#"></form>
+            <!-- Seletor de Idiomas -->
+            <select id="language-selector" class="form-control" style="width: auto; display: inline-block;">
+              <option value="pt">Português</option>
+              <option value="en">English</option>
+            </select>
+          <input type="checkbox" id="theme-toggle" hidden>
+          <label for="theme-toggle" class="theme-toggle"></label>
+      </nav>
+      <!-- End of Navbar -->
 
-            </form>
-            <input type="checkbox" id="theme-toggle" hidden>
-            <label for="theme-toggle" class="theme-toggle"></label>
+      <main>
+          <div class="header">
+              <div class="left">
+                  <h1 class="translate" data-key="modsHeader">Mods para seus games</h1>
+              </div>
+          </div>
 
-        </nav>
+          <div class="bottom-data">
+              <div class="orders">
+                  <div class="header">
+                      <i class='bx bx-cloud-download'></i>
+                      <h3 class="translate" data-key="availableMods">Mods Disponíveis</h3>
+                  </div>
+                  <table id="modTable">
+                      <thead>
+                          <tr>
+                              <th><span class="translate" data-key="game">Jogo</span></th>
+                              <!-- <th><span class="translate" data-key="name">Nome</span></th> -->
+                              <th><span class="translate" data-key="fileName">Nome do mod</span></th>
+                          </tr>
+                      </thead>
+                      <tbody id="modList">
+                          <!-- Os mods serão inseridos aqui -->
+                      </tbody>
+                  </table>
+                  
+                  <div id="pagination">
+                      <!-- Links de paginação serão inseridos aqui -->
+                  </div>
+                  <script src="mods.js"></script>
+              </div>
+          </div>
+      </main>
+  </div>
 
-        <!-- End of Navbar -->
+  <script src="index.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s" crossorigin="anonymous"></script>
+  <script>
+      // Objeto de traduções
+      const translations = {
+          en: {
+              modsHeader: 'Mods for your games',
+              availableMods: 'Available Mods',
+              game: 'Game',
+              name: 'Name',
+              fileName: 'Mod Name',
+              mods: 'Mods',
+              dlcs: 'DLCs',
+              servers: 'Servers',
+              logout: 'Logout',
+              noMods: 'No mods available at the moment.',
+              errorLoadingMods: 'Error loading mods. Please try again later.',
+              download: 'Download',
+              downloadComplete: 'Download Complete!'
+          },
+          pt: {
+              modsHeader: 'Mods para seus games',
+              availableMods: 'Mods Disponíveis',
+              game: 'Jogo',
+              name: 'Nome',
+              fileName: 'Nome do mod',
+              mods: 'Mods',
+              dlcs: 'DLCs',
+              servers: 'Servidores',
+              logout: 'Sair',
+              noMods: 'Nenhum mod disponível no momento.',
+              errorLoadingMods: 'Erro ao carregar os mods. Tente novamente mais tarde.',
+              download: 'Baixar',
+              downloadComplete: 'Download Completo!',
+              errorLoading: 'Erro ao carregar DLCs. Tente novamente mais tarde.',
+              noDLCs: 'Nenhum DLC disponível no momento.',
+              downloadComplete: 'Download Completo!'
+          }
+      };
 
-        <main>
-            <div class="header">
-                <div class="left">
-                    <h1>Mods para seus games</h1>
-                </div>
+      // Tenta recuperar o idioma salvo do localStorage ou usa 'pt' como padrão
+      let currentLanguage = localStorage.getItem('language') || 'pt';
 
-            </div>
+      // Função para aplicar traduções
+      function applyTranslations() {
+          document.querySelectorAll('.translate').forEach(element => {
+              const key = element.getAttribute('data-key');
+              element.textContent = translations[currentLanguage][key];
+          });
+      }
 
-            <div class="bottom-data">
-                <div class="orders">
-                    <div class="header">
-                        <i class='bx bx-cloud-download'></i>
-                        <h3>Mods Disponíveis</h3>
-                    </div>
-                    <table id="modTable">
-                        <thead>
-                            <tr>
-                                <th>Game</th>
-                                <th>Nome</th>
-                                <th>Nome do arquivo</th>
-                            </tr>
-                        </thead>
-                        <tbody id="modList">
-                            <!-- Os mods serão inseridos aqui -->
-                        </tbody>
-                    </table>
-                    
-                    <div id="pagination">
-                        <!-- Links de paginação serão inseridos aqui -->
-                    </div>
-                    <script src="mods.js"></script>
-                </div>
-            </div>
+      // Função para mudar o idioma
+      function changeLanguage() {
+          const selector = document.getElementById('language-selector');
+          currentLanguage = selector.value; // Define o idioma atual baseado na seleção
+          localStorage.setItem('language', currentLanguage); // Salva a seleção do idioma
+          applyTranslations(); // Aplica as traduções
+      }
 
-        </main>
+      document.getElementById('language-selector').addEventListener('change', (event) => {
+            const selectedLanguage = event.target.value;
+            // Envia o idioma selecionado para o main process
+            window.electronAPI.setLanguage(selectedLanguage);
+      });
 
-    </div>
+      // Define o valor do seletor de idiomas com o idioma salvo
+      document.addEventListener('DOMContentLoaded', () => {
+          const selector = document.getElementById('language-selector');
+          selector.value = currentLanguage; // Define o valor do seletor
+          applyTranslations(); // Aplica as traduções ao carregar a página
+      });
 
-    <script src="index.js"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+      // Evento para mudar o idioma quando o usuário selecionar uma opção
+      document.getElementById('language-selector').addEventListener('change', changeLanguage);
+  </script>
 </body>
-
 </html>

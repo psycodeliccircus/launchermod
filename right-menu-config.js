@@ -10,7 +10,7 @@ module.exports = [
         role: 'reload',
     },
     {
-        label: 'Quit',
+        label: 'Sair',
         role: 'quit',
     },
     { type: 'separator' },
