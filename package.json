@@ -1,6 +1,6 @@
 {
     "name": "launchermods",
-    "version": "1.2.2",
+    "version": "1.2.3",
     "description": "Sistema Launcher Mods",
     "main": "main.js",
     "scripts": {
