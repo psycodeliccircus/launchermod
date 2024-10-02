@@ -112,7 +112,7 @@ function createTray() {
     }
 }
 
-// Funções relacionadas a atualização
+// Funções relacionadas à atualização
 function handleUpdateChecking() {
     log.log('Checking for updates.');
 }
@@ -171,7 +171,7 @@ autoUpdater.on('update-available', handleUpdateAvailable);
 autoUpdater.on('download-progress', handleDownloadProgress);
 autoUpdater.on('error', handleUpdateError);
 autoUpdater.on('update-not-available', handleUpdateNotAvailable);
-autoUpdater.on('update-detected', handleUpdateDownloaded);
+autoUpdater.on('update-downloaded', handleUpdateDownloaded);
 
 // Evento quando o aplicativo está pronto
 app.whenReady().then(() => {
