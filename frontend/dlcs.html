@@ -38,27 +38,8 @@
           <source src="https://stream.zeno.fm/wdzntbh2hfwtv" type="audio/mpeg">
           Seu navegador não suporta o elemento de áudio.
         </audio>
-      </div>
-      
-      <style>
-        /* Estilos para a div que contém o player */
-        #audioContainer {
-          width: 220px; /* Defina a largura da div */
-          padding: 10px;
-          background-color: #f0f0f0; /* Cor de fundo da div */
-          border: 2px solid #ccc; /* Borda ao redor da div */
-          border-radius: 8px; /* Borda arredondada */
-          text-align: center; /* Centraliza o player de áudio */
-          margin: 20px auto; /* Margem automática para centralizar horizontalmente */
-        }
-      
-        /* Define a largura e altura personalizadas do player de áudio */
-        #audioPlayer {
-          width: 100%; /* Player ajusta-se à largura da div */
-          height: 10px; /* Altura personalizada do player */
-        }
-      </style>
-      
+    </div>
+
       <script>
         // Get the audio element
         const audioPlayer = document.getElementById('audioPlayer');
@@ -71,19 +52,20 @@
 
     <!-- Main Content -->
     <div class="content">
-        <!-- Navbar -->
-        <nav>
-            <i class='bx bx-menu'></i>
-            <form action="#"></form>
-            <!-- Seletor de Idiomas -->
-            <select id="language-selector" class="form-control" style="width: auto; display: inline-block;">
-              <option value="pt">Português</option>
-              <option value="en">English</option>
-            </select>
-            <input type="checkbox" id="theme-toggle" hidden>
-            <label for="theme-toggle" class="theme-toggle"></label>
-        </nav>
-        <!-- End of Navbar -->
+      <!-- Navbar -->
+      <nav>
+        <i class='bx bx-menu'></i>
+        <form action="#"></form>
+        <input type="checkbox" id="theme-toggle" hidden>
+        <label for="theme-toggle" class="theme-toggle"></label>
+        
+        <!-- Seletor de Idiomas -->
+        <select id="language-selector" class="form-control" style="width: auto; display: inline-block;">
+            <option value="pt">Português</option>
+            <option value="en">English</option>
+        </select>
+      </nav>
+      <!-- End of Navbar -->
 
         <main>
             <div class="header">

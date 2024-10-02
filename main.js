@@ -42,9 +42,9 @@ function createWindow() {
     });
 
     mainWindow.maximize();
-    mainWindow.setResizable(false);
-    mainWindow.setMaximizable(false);
-    mainWindow.setMinimizable(false);
+    mainWindow.setResizable(true);
+    mainWindow.setMaximizable(true);
+    mainWindow.setMinimizable(true);
     //mainWindow.webContents.openDevTools();
     new AppMenu(mainWindow);
     mainWindow.loadFile(path.join(__dirname, 'frontend', 'login.html'));

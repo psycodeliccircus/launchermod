@@ -768,3 +768,65 @@ a:hover {
     border-color: var(--light); /* Cor da borda ao focar */
 }
 
+/* Estilos para a div que contém o player */
+#audioContainer {
+    width: 220px; /* Defina a largura da div */
+    padding: 10px;
+    height: 40px;
+    background-color: var(--light); /* Cor de fundo da div */
+    border: 2px solid var(--grey); /* Borda ao redor da div */
+    border-radius: 8px; /* Borda arredondada */
+    text-align: center; /* Centraliza o player de áudio */
+    margin: -305px auto; /* Margem automática para centralizar horizontalmente */
+}
+        
+/* Define a largura e altura personalizadas do player de áudio */
+#audioPlayer {
+    background-color: var(--light); /* Cor de fundo da div */
+    width: 100%; /* Player ajusta-se à largura da div */
+    height: 20px; /* Altura personalizada do player */
+}
+
+#audioPlayer::-webkit-media-controls-panel {
+    background-color: var(--light); /* Cor do fundo dos controles no Webkit */
+    color: var(--primary);
+}
+
+/* Estilos para botões e controles no Webkit (Chrome, Safari) */
+#audioPlayer::-webkit-media-controls-play-button{
+    color: var(--dark); /* Inverte a cor dos ícones para branco */
+}
+#audioPlayer::-webkit-media-controls-volume-control-container{
+    color: var(--primary); /* Inverte a cor dos ícones para branco */
+}
+#audioPlayer::-webkit-media-controls-mute-button{
+    color: var(--dark); /* Inverte a cor dos ícones para branco */
+}
+#audioPlayer::-webkit-media-controls-timeline{
+    color: var(--dark); /* Inverte a cor dos ícones para branco */
+}
+#audioPlayer::-webkit-media-controls-current-time-display{
+    color: var(--dark); /* Inverte a cor dos ícones para branco */
+}
+#audioPlayer::-webkit-media-controls-time-remaining-display{
+    color: var(--dark); /* Inverte a cor dos ícones para branco */
+}
+#audioPlayer::-webkit-media-controls-seek-back-button{
+    color: var(--dark); /* Inverte a cor dos ícones para branco */
+}
+#audioPlayer::-webkit-media-controls-seek-forward-button {
+    color: var(--dark); /* Inverte a cor dos ícones para branco */
+}
+
+#audioPlayer::-webkit-media-controls-timeline {
+    background-color: var(--light); /* Cor do fundo da barra de progresso */
+    color: var(--dark); /* Cor da linha do tempo */
+}
+
+#audioPlayer::-moz-range-track {
+    background-color: var(--light); /* Cor da faixa de progresso */
+}
+
+#audioPlayer::-webkit-media-controls-volume-slider-container {
+    color: var(--primary); /* Inverte a cor do slider de volume para branco */
+}
