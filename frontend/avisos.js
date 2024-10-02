@@ -7,8 +7,15 @@ function fetchAvisos() {
         .then(response => response.json())
         .then(data => {
             if (data.length > 0) {
-                displayAvisos(data);
-                document.getElementById('avisosContainer').style.display = 'block'; // Mostrar container se houver avisos
+                const ultAvisoVisto = localStorage.getItem('ultimoAvisoVisto');
+                
+                // Filtrar avisos mais novos
+                const novosAvisos = data.filter(aviso => aviso.id > ultAvisoVisto);
+                
+                if (novosAvisos.length > 0) {
+                    displayAvisos(novosAvisos);
+                    document.getElementById('avisosContainer').style.display = 'block'; // Mostrar container se houver novos avisos
+                }
             }
         })
         .catch(error => console.error('Erro ao carregar avisos:', error));
@@ -29,6 +36,11 @@ function displayAvisos(avisos) {
                 <span aria-hidden="true">&times;</span>
             </button>
         `;
+
+        // Salvar o ID do aviso quando o usuário fechar
+        alertDiv.querySelector('.close').addEventListener('click', () => {
+            localStorage.setItem('ultimoAvisoVisto', aviso.id);
+        });
 
         avisosContainer.appendChild(alertDiv);
     });
