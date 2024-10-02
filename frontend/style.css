@@ -830,3 +830,18 @@ a:hover {
 #audioPlayer::-webkit-media-controls-volume-slider-container {
     color: var(--primary); /* Inverte a cor do slider de volume para branco */
 }
+
+#anuncioContainer {
+    display: none;
+    margin: 20px 0;
+    text-align: center;
+}
+.anuncio {
+    border: 2px solid var(--grey); /* Borda azul */
+    border-radius: 8px; /* Bordas arredondadas */
+    overflow: hidden; /* Para que a borda fique arredondada */
+    transition: transform 0.3s; /* Animação ao passar o mouse */
+}
+.anuncio:hover {
+    transform: scale(1.05); /* Aumenta um pouco o anúncio ao passar o mouse */
+}
